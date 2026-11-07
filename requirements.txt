@@ -1,0 +1,5 @@
+numpy>=2.0,<3
+openpyxl>=3.1,<4
+pandas>=2.2,<3
+Py1546 @ git+https://github.com/eeveetza/Py1546  # ITU-R P.1546-6 reference implementation (terrestrial.py)
+anthropic>=1.0  # optional: letters.py --polish

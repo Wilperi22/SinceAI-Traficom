@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Korea (Republic of) (KOR)
+Date: 2026-11-07
+Subject: BR IFIC 3074 - satellite network KPS-NGSO-A, notice 124520188 (and related notice 324520188):
+         power flux-density over Finnish territory - RR No. 9.14 coordination threshold exceeded
+
+Dear colleagues,
+
+The Administration of Finland has examined the CR/C information for the satellite
+network KPS-NGSO-A published in BR IFIC (Space Services) No. 3074. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the coordination threshold of RR Appendix 5, so that coordination with Finland is required
+under No. 9.14 of the Radio Regulations.
+
+Technical summary
+  Notice / network:           124520188 / KPS-NGSO-A
+  Orbit:                      non-geostationary orbit, altitude 32624 km
+  Assignment:                 2484.056-2500.0 MHz, beam SH, emission 15M9G7D--
+  Service (criterion row):    RDSS (AP5_2483.5_2500_RDSS)
+  Regulation:                 RR Ed. 2024 Vol. 2 App. 5 Annex 1 Table 5-2, NOTES 9-10 (Finland) (No. 9.14)
+  e.i.r.p. in 1 MHz:          43.9 dBW (s_beam notified peak e.i.r.p. in ref. BW)
+  Worst-case geometry:        elevation 68.9°, slant range 32983 km
+  Calculated pfd:             -117.5 dB(W/m²) in 1 MHz
+  App. 5 threshold:           -128.0 dB(W/m²) in 1 MHz
+  Exceedance:                 10.5 dB
+  Finnish services (M4):      MOBILE; MOBILE-SATELLITE (SPACE-TO-EARTH); RADIODETERMINATION SATELLITE SERVICE (SPACE-TO-EARTH)
+  Finnish stations in band:   none in the special-interest list
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by KPS-NGSO-A over the territory of Finland, and
+  2. effect coordination with the Administration of Finland under RR No. 9.14 before the
+     assignments are notified.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

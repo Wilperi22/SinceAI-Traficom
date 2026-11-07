@@ -1,0 +1,41 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Russian Federation (RUS)
+Date: 2026-11-07
+Subject: BR IFIC (Terrestrial Services) No. 3076 - land-mobile assignment 93082323
+         (LEN VYBORG GRUZOVOI, 153.3 MHz): field strength at the Finnish border
+
+Dear colleagues,
+
+The Administration of Finland has examined the new land-mobile assignment
+93082323 (station class FB) published in BR IFIC (Terrestrial Services)
+No. 3076. Our calculation indicates that the field strength produced on Finnish territory
+exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).
+
+Technical summary
+  Assignment:                 93082323 (adm. ref. 0234FB2026), 153.3 MHz, 16.8 kHz, F3E--
+  Transmitter site:           LEN VYBORG GRUZOVOI, 60.7019 N 28.7919 E
+  e.r.p. / antenna height:    12.8 dBW / 20 m
+  Worst point in Finland:     land border, 60.8526 N 28.3267 E (30.3 km)
+  Path:                       Land 6.1 km + Cold 2.0 km + Land 22.2 km
+  Model:                      ITU-R P.1546-6 (Py1546), 10% time, 50% locations, h2=10 m, Rural, no terrain
+  Calculated field strength:  20.1 dB(uV/m)
+  T/R 25-08 trigger:          20.0 dB(uV/m)
+  Exceedance:                 0.1 dB
+  Finnish stations affected:  none in the special-interest list above the trigger
+
+The ITU records list the following coordination status with Finland for this assignment:
+  COORD COMPLETED (RR6.7, 2026-06-26)
+Finland will verify this status against its national frequency register.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the technical characteristics of the assignment, and
+  2. coordinate the assignment with the Administration of Finland before bringing it into use,
+     or reduce the field strength at the border below the T/R 25-08 trigger.
+
+The Administration of Finland reserves its rights with respect to protection of its
+radiocommunication services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

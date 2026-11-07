@@ -1,0 +1,23 @@
+# secrets
+.env
+
+# large IFIC databases and pipeline caches (re-created by pipeline.py)
+*.mdb
+*.accdb
+*.sqlite
+!results.sqlite
+*.sqlite.partial
+data/
+inbox/*
+!inbox/.gitkeep
+
+# python
+__pycache__/
+.venv/
+*.pyc
+
+# stray empty files / editor locks
+/=
+/56
+.~lock.*
+pipeline.log

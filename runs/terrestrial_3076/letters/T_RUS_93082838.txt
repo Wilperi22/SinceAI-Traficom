@@ -1,0 +1,41 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Russian Federation (RUS)
+Date: 2026-11-07
+Subject: BR IFIC (Terrestrial Services) No. 3076 - land-mobile assignment 93082838
+         (KRL KOSTOMUKSHA, 152.9 MHz): field strength at the Finnish border
+
+Dear colleagues,
+
+The Administration of Finland has examined the new land-mobile assignment
+93082838 (station class FB) published in BR IFIC (Terrestrial Services)
+No. 3076. Our calculation indicates that the field strength produced on Finnish territory
+exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).
+
+Technical summary
+  Assignment:                 93082838 (adm. ref. 0221FB2026), 152.9 MHz, 16.8 kHz, F3E--
+  Transmitter site:           KRL KOSTOMUKSHA, 64.6325 N 30.7911 E
+  e.r.p. / antenna height:    15.9 dBW / 28 m
+  Worst point in Finland:     land border, 64.6624 N 30.1878 E (28.9 km)
+  Path:                       Land 28.9 km
+  Model:                      ITU-R P.1546-6 (Py1546), 10% time, 50% locations, h2=10 m, Rural, no terrain
+  Calculated field strength:  26.5 dB(uV/m)
+  T/R 25-08 trigger:          20.0 dB(uV/m)
+  Exceedance:                 6.5 dB
+  Finnish stations affected:  none in the special-interest list above the trigger
+
+The ITU records list the following coordination status with Finland for this assignment:
+  COORD COMPLETED (RR6.7, 2026-07-03)
+Finland will verify this status against its national frequency register.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the technical characteristics of the assignment, and
+  2. coordinate the assignment with the Administration of Finland before bringing it into use,
+     or reduce the field strength at the border below the T/R 25-08 trigger.
+
+The Administration of Finland reserves its rights with respect to protection of its
+radiocommunication services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

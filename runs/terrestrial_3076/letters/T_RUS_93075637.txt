@@ -1,0 +1,37 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Russian Federation (RUS)
+Date: 2026-11-07
+Subject: BR IFIC (Terrestrial Services) No. 3076 - land-mobile assignment 93075637
+         (KRL LYASKELYA, 152.9 MHz): field strength at the Finnish border
+
+Dear colleagues,
+
+The Administration of Finland has examined the new land-mobile assignment
+93075637 (station class FB) published in BR IFIC (Terrestrial Services)
+No. 3076. Our calculation indicates that the field strength produced on Finnish territory
+exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).
+
+Technical summary
+  Assignment:                 93075637 (adm. ref. 0330FB2026), 152.9 MHz, 16.8 kHz, F3E--
+  Transmitter site:           KRL LYASKELYA, 61.7606 N 30.9894 E
+  e.r.p. / antenna height:    17.4 dBW / 26 m
+  Worst point in Finland:     land border, 62.0108 N 30.3751 E (42.5 km)
+  Path:                       Land 42.5 km
+  Model:                      ITU-R P.1546-6 (Py1546), 10% time, 50% locations, h2=10 m, Rural, no terrain
+  Calculated field strength:  20.9 dB(uV/m)
+  T/R 25-08 trigger:          20.0 dB(uV/m)
+  Exceedance:                 0.9 dB
+  Finnish stations affected:  none in the special-interest list above the trigger
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the technical characteristics of the assignment, and
+  2. coordinate the assignment with the Administration of Finland before bringing it into use,
+     or reduce the field strength at the border below the T/R 25-08 trigger.
+
+The Administration of Finland reserves its rights with respect to protection of its
+radiocommunication services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

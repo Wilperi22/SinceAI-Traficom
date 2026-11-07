@@ -1,0 +1,301 @@
+INTERFERENCE CHECK CRITERIA
+===========================
+
+Purpose
+-------
+Analyse the mandatory evaluation datasets separately:
+
+  1. Space IFIC 3074
+  2. Terrestrial IFIC 3076
+
+The output must be technically reviewable. A frequency overlap is a candidate
+for review, not automatically an interference error. A confirmed ERROR requires
+an applicable technical protection criterion and a failed comparison.
+
+The current ific3083.sqlite file must not be used as the mandatory 3074/3076
+result unless its source issue and dataset type are verified. Keep the Space
+and Terrestrial databases and result files separate.
+
+Required input data
+-------------------
+
+A. Finnish national allocation data
+   File: m4.json
+   Source: https://opendata.traficom.fi/api/v13/Taajuusjakotaulukko
+   Important fields:
+     - Sub_band_lower_limit__Hz_
+     - Sub_band_upper_limit__Hz_
+     - Services_in_Finland
+     - Sub_band_usage
+     - Bandwidth
+     - Comment
+   Purpose:
+     - Identify Finnish frequency allocations.
+     - Identify the Finnish service and regulatory context.
+     - Provide the frequency ranges for initial candidate filtering.
+   M4 is not, by itself, a satellite PFD limit table.
+
+B. Finnish special-interest station data
+   File: Traficom materials/Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx
+   Purpose:
+     - Identify individual Finnish stations and protected uses.
+     - Provide TX/RX centre frequencies and channel bandwidths.
+     - Provide coordinates and station technical parameters.
+     - Support terrestrial field-strength calculations.
+   Important fields include station number, longitude, latitude, TX/RX
+   frequency, channel bandwidth, antenna height, antenna gain, radiation power,
+   radiation direction, directivity, and polarization.
+   Transmitter power is not PFD and must not be compared directly to PFD.
+
+C. Space IFIC 3074
+   Source: ITU Space IFIC download service.
+   Required notice families:
+     - API/A
+     - CR/C
+     - AP30, including AP30A and AP30B
+   Required output: separate Space IFIC 3074 candidate and error files.
+
+D. Terrestrial IFIC 3076
+   Source: ITU Terrestrial IFIC download service.
+   Scope: foreign terrestrial land-mobile notices for the side quest.
+   Required output: separate Terrestrial IFIC 3076 candidate and error files.
+
+E. Regulatory and technical criteria
+   Use the version applicable to the IFIC issue date and record the exact
+   document, section, table, revision, and page in the audit output.
+   Candidate sources:
+     - ITU Radio Regulations: https://www.itu.int/pub/r-reg-rr
+     - AP30/AP30A/AP30B provisions in the ITU Radio Regulations
+     - ITU BR SpaceCom and GIBC tools/documentation:
+       https://www.itu.int/en/ITU-R/software/Pages/space-network-software.aspx
+     - ITU-R P.1546 for terrestrial field strength:
+       https://www.itu.int/rec/R-REC-P.1546
+     - CEPT/ECC implementation and applicable ECC decisions/recommendations:
+       https://docdb.cept.org/implementation/overview
+     - ECC T/R 25-08 where it is the applicable land-mobile criterion
+     - Finnish Regulation M4 and, where relevant, M15:
+       https://www.finlex.fi/fi/viranomaiset/maarayskokoelmat/traficom-viestinta/2026/3
+       https://www.finlex.fi/fi/viranomaiset/maarayskokoelmat/traficom-viestinta/2025/51209
+
+Before production analysis, create a criteria register containing:
+  criterion_id, dataset, frequency range, service, direction, limit, unit,
+  reference bandwidth, geographic condition, source document, source section,
+  revision/date, and reviewer/status.
+
+Common data-quality checks
+--------------------------
+
+Run these checks before technical comparisons:
+
+1. Required fields are present and numeric where required.
+2. Frequency lower limit is less than frequency upper limit.
+3. Frequency units are normalized to Hz internally; report MHz for readability.
+4. Bandwidth is positive and has a known unit.
+5. PFD is finite and has a known unit and reference bandwidth.
+6. PFD frequency interval overlaps its parent notice frequency interval.
+7. Coordinates are valid WGS84 longitude/latitude values.
+8. Antenna height, power, gain, and direction are either valid or explicitly
+   marked unknown.
+9. Notice IDs are unique within each source dataset.
+10. Source issue, source file hash, import time, and conversion tool version are
+    recorded.
+
+A data-quality failure is not automatically harmful interference. Emit:
+  REVIEW:DATA_QUALITY with the failing field and source row.
+
+Frequency overlap rule
+----------------------
+
+Represent every frequency use as a half-open interval [lower, upper).
+Two intervals overlap when:
+
+  notice_lower < finnish_upper AND notice_upper > finnish_lower
+
+A boundary touching at exactly one endpoint is not an overlap.
+
+For each overlap, record:
+  - notice ID and source dataset
+  - notice frequency lower/upper limits
+  - Finnish M4 band ID and limits, if matched
+  - Finnish station number and interval, if matched
+  - overlap lower/upper limits
+  - emission bandwidth and receiver/channel bandwidth where available
+
+SPACE IFIC 3074 CHECKS
+=======================
+
+S1. Notice-scope check
+    Include API/A, CR/C, AP30A, and AP30B records. Record notice type and
+    status/action. Withdrawn or superseded records must not be reported as new
+    active errors, but may be retained for change history.
+
+S2. Finnish frequency relevance
+    Compare notice frequency intervals with M4 intervals and special-interest
+    station intervals. Keep a candidate only when the frequency overlap rule
+    succeeds. Record the Finnish service and station evidence.
+
+S3. Service and allocation compatibility
+    Check whether the ITU notice emission/service is compatible with or could
+    affect the Finnish service in the overlapping band. The applicable M4,
+    Radio Regulations, or AP30 provision must be cited. Frequency overlap alone
+    produces REVIEW:FREQUENCY_OVERLAP, not ERROR.
+
+S4. PFD source and unit check
+    Prefer the notified PFD in the IFIC c_pfd table. Record:
+      - pfd value
+      - c_pfd frequency interval
+      - c_pfd reference bandwidth (bdwdth)
+      - PFD unit and sign convention
+      - location/reference point and direction if supplied
+    If the IFIC does not provide a usable PFD, use the authorized GIBC or
+    SpaceCom calculation and record all input parameters and tool/version.
+    Never compare PFD with Excel transmitter power.
+
+S5. PFD normalization
+    Normalize the notified PFD and regulatory limit to the same unit and
+    reference bandwidth before comparison. Do not convert until the meaning of
+    bdwdth and the PFD unit is confirmed. Record the conversion formula and
+    source assumptions. An unknown reference bandwidth produces
+    REVIEW:PFD_UNIT_OR_BANDWIDTH, not ERROR.
+
+S6. PFD protection-limit check
+    Select the limit from the applicable ITU Radio Regulations, AP30 provision,
+    or an authorized GIBC/SpaceCom result. M4 and the special-interest Excel
+    file identify Finnish use but do not automatically supply a satellite PFD
+    limit.
+
+    After normalization, an exceedance is:
+
+      notified_pfd > applicable_pfd_limit
+
+    Because PFD values are commonly negative dB values, -110 is greater than
+    -118 and therefore exceeds a -118 limit.
+
+S7. AP30-specific check
+    For AP30A/AP30B notices, apply the relevant AP30 regulatory procedure and
+    protection limits. Do not use a generic M4 threshold when an AP30-specific
+    criterion applies. Record the AP30 section/table and all geographic or
+    service-area conditions.
+
+S8. Aggregate PFD check
+    If the applicable criterion concerns aggregate interference, convert each
+    contribution from dB to linear units, sum in linear units, then convert back
+    to dB. Do not add dB values directly. Record all included notice IDs and
+    exclusions.
+
+S9. Space result classification
+    ERROR only if all are true:
+      - required notice type is in scope;
+      - frequency overlap exists;
+      - applicable service/geographic condition is satisfied;
+      - PFD unit and reference bandwidth are compatible or normalized;
+      - an authoritative limit is identified and cited; and
+      - notified/calculated PFD exceeds that limit.
+
+    REVIEW if there is overlap but the regulatory limit, unit, geometry, or PFD
+    calculation is missing or uncertain.
+
+TERRESTRIAL IFIC 3076 CHECKS
+=============================
+
+T1. Notice-scope and change check
+    Use consecutive Terrestrial IFIC issues when available. Classify each
+    foreign assignment as NEW, MODIFIED, WITHDRAWN, or UNCHANGED by comparing
+    stable notice/assignment identifiers and relevant technical fields.
+
+T2. Foreign-assignment filter
+    Exclude Finnish administration records from the foreign-assignment side
+    quest. Retain the administration code and country name in every result.
+
+T3. Frequency and channel overlap
+    Compare foreign assignment frequency/channel intervals against M4 bands and
+    Finnish special-interest station intervals using the common overlap rule.
+    Check centre frequency, occupied bandwidth, emission class, and adjacent
+    channel conditions where receiver selectivity data exists.
+
+T4. Geographic relevance
+    Calculate distance and azimuth from each foreign transmitter to the Finnish
+    protected station or relevant Finnish border/reference point. Record the
+    coordinate source, distance formula, antenna coordinates, and assumptions.
+
+T5. Field-strength calculation
+    Use ITU-R P.1546 where applicable. Record at minimum:
+      - frequency
+      - path distance
+      - transmitter effective radiated power or equivalent input
+      - transmitting antenna height
+      - receiving antenna height
+      - time percentage
+      - terrain/clutter/environment assumptions
+      - antenna direction/directivity and polarization assumptions
+      - model edition and implementation version
+    If a required P.1546 input is unavailable, emit REVIEW:P1546_INPUT_MISSING.
+
+T6. Protection criterion
+    Compare calculated field strength with the applicable criterion from M4,
+    CEPT/ECC material, ECC T/R 25-08, or another identified national/ITU rule.
+    The exact threshold depends on the band, service, bandwidth, time
+    percentage, and receiving conditions. Record the source section/table.
+
+T7. Terrestrial error rule
+    ERROR only if all are true:
+      - foreign assignment is in scope;
+      - frequency/channel overlap exists;
+      - geographic/path conditions are satisfied;
+      - P.1546 calculation is complete and reproducible; and
+      - calculated field strength exceeds the cited protection criterion.
+
+    REVIEW if the assignment overlaps but the model inputs or applicable
+    protection criterion are incomplete.
+
+Output and audit requirements
+-----------------------------
+
+Create separate result files:
+  - space_3074_candidates.json
+  - space_3074_errors.json
+  - terrestrial_3076_candidates.json
+  - terrestrial_3076_errors.json
+  - interference_audit.txt
+
+Each ERROR record must contain:
+  - severity: ERROR
+  - dataset and IFIC issue
+  - notice and administration identifiers
+  - frequency intervals and exact overlap
+  - measured/calculated value
+  - limit and unit
+  - reference bandwidth
+  - calculation/model name and parameters
+  - regulatory source citation
+  - reason for error
+  - source database/file and source row/table
+  - data and criteria version/hash
+
+Each REVIEW record must state why it could not be classified as ERROR.
+The LLM may draft correspondence only from these structured records; it must
+not invent missing limits, calculations, or regulatory conclusions.
+
+Minimum audit reason codes
+--------------------------
+
+  DATA_QUALITY
+  FREQUENCY_OVERLAP
+  PFD_LIMIT_EXCEEDED
+  PFD_UNIT_OR_BANDWIDTH
+  PFD_LIMIT_MISSING
+  AP30_CRITERION_MISSING
+  P1546_INPUT_MISSING
+  FIELD_STRENGTH_LIMIT_EXCEEDED
+  CHANGE_NEW
+  CHANGE_MODIFIED
+  CHANGE_WITHDRAWN
+  REVIEW_REQUIRED
+
+Final decision rule
+-------------------
+
+Do not label a case harmful interference solely because frequencies overlap.
+Use ERROR only after a deterministic, cited technical criterion fails. Use
+REVIEW when the data or regulatory basis is incomplete, and retain every check
+and reason in interference_audit.txt.

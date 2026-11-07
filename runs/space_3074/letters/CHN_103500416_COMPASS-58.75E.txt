@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of China (People's Republic of) (CHN)
+Date: 2026-11-07
+Subject: BR IFIC 3074 - satellite network COMPASS-58.75E, notice 103500416 (and related notice 303500416):
+         power flux-density over Finnish territory - RR No. 9.14 coordination threshold exceeded
+
+Dear colleagues,
+
+The Administration of Finland has examined the Notification (11.2) information for the satellite
+network COMPASS-58.75E published in BR IFIC (Space Services) No. 3074. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the coordination threshold of RR Appendix 5, so that coordination with Finland is required
+under No. 9.14 of the Radio Regulations.
+
+Technical summary
+  Notice / network:           103500416 / COMPASS-58.75E
+  Orbit:                      geostationary orbit at 58.8°
+  Assignment:                 2483.5-2500.0 MHz, beam SDN, emission 16M5G9W--
+  Service (criterion row):    RDSS (AP5_2483.5_2500_RDSS)
+  Regulation:                 RR Ed. 2024 Vol. 2 App. 5 Annex 1 Table 5-2, NOTES 9-10 (Finland) (No. 9.14)
+  e.i.r.p. in 1 MHz:          42.2 dBW (emiss.pwr_ds_max x min(ref BW, emission BW) + peak gain)
+  Worst-case geometry:        elevation 17.3°, slant range 39825 km
+  Calculated pfd:             -120.8 dB(W/m²) in 1 MHz
+  App. 5 threshold:           -128.0 dB(W/m²) in 1 MHz
+  Exceedance:                 7.2 dB
+  Finnish services (M4):      MOBILE; MOBILE-SATELLITE (SPACE-TO-EARTH); RADIODETERMINATION SATELLITE SERVICE (SPACE-TO-EARTH)
+  Finnish stations in band:   none in the special-interest list
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by COMPASS-58.75E over the territory of Finland, and
+  2. effect coordination with the Administration of Finland under RR No. 9.14 before the
+     assignments are notified.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

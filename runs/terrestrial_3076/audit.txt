@@ -1,0 +1,44 @@
+TERRESTRIAL IFIC 3076 - pipeline run
+Source: BR_IFIC_3076.zip (sha256 adc9b826419bfcc5e63855ad48a1184d2a47ae579ca385c5162a3dbdb2fd94a9)
+Database: data/sqlite/BR_IFIC_3076_adc9b826419b.sqlite
+Criterion: ECC T/R 25-08 A1.2.3, 20 dB(uV/m) in 25 kHz; P.1546-6 10% time; alert gate 0 dB
+Run (UTC): 2026-11-07T16:55:54+00:00
+Input BR_IFIC_3076_adc9b826419b.sqlite: sha256 a787ffe7a8ca76cd71c8faed49e31b558e3a9226d82793ae866f8e79af54aa8b (12337152 bytes)
+Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
+Input Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx: sha256 bb7f481f085fb6c457efc04b9b6bb8250c42ea81bab4b4a0e518c93834e03c8a (100809 bytes)
+Input finland_boundaries.csv: sha256 1c27f404387a2272a5f5ef62942a498fd31dacd99d8806e5606e18bb43fc5fcb (657513 bytes)
+Input land_mask.npz: sha256 5c356f56a50db3de9743b58b3bcbbd5235badeffccab5bf15533e511906deb5a (10471 bytes)
+Terrestrial IFIC 3076: 1878 land-mobile records (FB, FL, ML)
+Trends - land-mobile records by administration / class / change type:
+change_type  MODIFIED  NEW  RECORDED
+adm stn_cls                         
+CHN FB              0   88         0
+    ML              0  106         0
+F   FB              0    2         0
+IND FL              0    9         0
+KAZ FB              0  206         0
+    ML              0  206         0
+POL FB              0    9         0
+RUS FB              5   47         5
+    ML              6   56         6
+SVN FB              0  637         0
+    ML              0  490         0
+Trends - NEW land-mobile assignments by administration and band:
+band  <174 MHz  174-470  470-694  694-960  960-1500  1500-2700  >2700
+adm                                                                  
+CHN          2      167        6       14         0          5      0
+F            0        2        0        0         0          0      0
+IND          0        9        0        0         0          0      0
+KAZ          0        0        0      260         0        152      0
+POL          0        0        0        9         0          0      0
+RUS         78        4        0       21         0          0      0
+SVN          0        0        0        0         0       1127      0
+Foreign administrations: 1878 records; Finnish records excluded: 0
+Not evaluated: 0 WITHDRAWN (CHANGE_WITHDRAWN), 11 RECORDED (pre-modification state of a MODIFIED record)
+Coordination with Finland recorded (fxm_coord, adm FIN): 10 evaluated records - reported in column coordination_with_fin, still flagged for verification against the Traficom register
+REVIEW (not exported): 9 records without point coordinates (zones: ['IND'])
+REVIEW:P1546_INPUT_MISSING (not exported): 0 records without e.r.p. or antenna height
+Out of P.1546 range (> 1000 km from Finland): 1801 records (SVN: 1127, KAZ: 412, CHN: 194, RUS: 66, F: 2)
+Evaluated with ITU-R P.1546-6 (Py1546 reference implementation): 57 records from POL, RUS
+Alerts (margin >= 0 dB): 6; concerns: 2 (NEAR_LIMIT: 2)
+Exported 6 alerts and 2 concerns in 3.3 s

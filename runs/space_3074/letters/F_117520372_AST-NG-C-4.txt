@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of France (F)
+Date: 2026-11-07
+Subject: BR IFIC 3074 - satellite network AST-NG-C-4, notice 117520372 (and related notice 317520372):
+         power flux-density over Finnish territory - exceeding RR Table 21-4
+
+Dear colleagues,
+
+The Administration of Finland has examined the CR/C information for the satellite
+network AST-NG-C-4 published in BR IFIC (Space Services) No. 3074. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the limits of Article 21, Table 21-4 of the
+Radio Regulations.
+
+Technical summary
+  Notice / network:           117520372 / AST-NG-C-4
+  Orbit:                      non-geostationary orbit, altitude 415 km
+  Assignment:                 2500.0-2520.0 MHz, beam S3D05, emission 17K5G7W--
+  Service (criterion row):    FSS/BSS/RDSS/MSS (2500_2690_FSS_BSS_RDSS_MSS)
+  Regulation:                 RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23)
+  e.i.r.p. in 1 MHz:          0.7 dBW (s_beam notified peak e.i.r.p. in ref. BW)
+  Worst-case geometry:        elevation 90.0°, slant range 415 km
+  Calculated pfd:             -122.7 dB(W/m²) in 1 MHz
+  Table 21-4 limit:           -125.0 dB(W/m²) in 1 MHz
+  Exceedance:                 2.4 dB
+  Finnish services (M4):      MOBILE
+  Finnish stations in band:   985264(TX), 985046(TX)
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by AST-NG-C-4 over the territory of Finland, and
+  2. take the necessary measures (e.g. pfd masks, beam pointing restrictions) to ensure
+     compliance with RR No. 21.16 and Table 21-4, so that Finnish services are protected.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space
