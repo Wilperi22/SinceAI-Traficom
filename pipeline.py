@@ -45,7 +45,7 @@ DATA = ROOT / "data"
 RUNS = ROOT / "runs"
 RESULTS_DB = ROOT / "results.sqlite"
 M4_URL = "https://opendata.traficom.fi/api/v13/Taajuusjakotaulukko"
-ITU_SPACE_IFIC_URL = "https://www.itu.int/sns/ific10/ific{num}.zip"   # as in process_itu_mdb.py
+ITU_SPACE_IFIC_URL = "https://www.itu.int/sns/ific10/ific{num}.zip"   # ITU BR Space IFIC download
 DEFAULTS = {
     "m4": ROOT / "m4.json",
     "limits": ROOT / "pfd.json",

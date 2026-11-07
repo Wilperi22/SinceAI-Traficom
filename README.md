@@ -78,14 +78,13 @@ from Finland. Margins are command-line options.
 IFIC tables (CSN-SSO, PAZ_2-A, Kostomuksha), RR footnote rules, BR cross-check, and invariants on the
 outputs. Each audit file records input SHA-256 hashes and model versions.
 
-## Other tools in the repository
+## Other files
 
 | File | Description |
 |---|---|
-| `process_itu_mdb.py` | Stand-alone downloader/converter: IFIC number, ITU URL, .zip or .mdb -> SQLite, plus the analytical view `vw_space_<N>_pfd_inputs`. `python process_itu_mdb.py 3083 <output_dir>` |
-| `app.py` | Streamlit natural-language explorer of the Space IFIC database with an interactive map of the Finnish stations: `pip install streamlit folium streamlit-folium && streamlit run app.py` (expects `ific3074.sqlite` in the repository root) |
-| `schema.txt` | Full DDL of the converted Space IFIC 3074 database |
-| `convert_mdb.py` | MDB -> SQLite converter with per-table row-count verification (used by `pipeline.py`) |
+| `convert_mdb.py` | MDB -> SQLite converter with per-table row-count verification (used by `pipeline.py`; also `python convert_mdb.py <file.mdb>`) |
+| `build_boundaries.py` | Builds `geodata/` (Finnish land border, territorial sea, land mask) from Natural Earth 1:10m |
+| `Table 21-4.odt`, `interference_check_criteria.txt` | Working notes: RR Table 21-4 extract and the screening criteria |
 
 ## Contacts
 
