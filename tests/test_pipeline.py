@@ -92,6 +92,18 @@ class SpacePhysics(unittest.TestCase):
         self.assertEqual(data["37500_40000_FSS_MSS_NGSO"]["max_satellites"], 99)  # RR fn 11 (21.16.4)
         self.assertEqual(data["AP5_2483.5_2500_MSS_NGSO"]["curve"][0][1], -124.5)  # App. 5 NOTE 9 lists Finland
 
+    def test_terrestrial_m4_excludes_satellite_services(self):
+        """GitHub issue #1: 'MOBILE-SATELLITE' etc. must not count as terrestrial Finnish use."""
+        services = pd.Series(["MOBILE-SATELLITE (SPACE-TO-EARTH)", "FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH)",
+                              "AMATEUR-SATELLITE", "RADIONAVIGATION-SATELLITE (SPACE-TO-EARTH)",
+                              "AERONAUTICAL MOBILE-SATELLITE (R)", "FIXED", "MOBILE EXCEPT AERONAUTICAL MOBILE",
+                              "BROADCASTING", "METEOROLOGICAL AIDS", "RADIO ASTRONOMY"])
+        self.assertEqual(list(ie.is_terrestrial_m4(services)),
+                         [False, False, False, False, False, True, True, True, True, False])
+        m4 = ie.load_m4(ROOT / "m4.json")
+        terr = m4.loc[ie.is_terrestrial_m4(m4["Services_in_Finland"]), "Services_in_Finland"]
+        self.assertFalse(terr.str.upper().str.contains("SATELLITE").any())
+
     def test_bandwidth_parsers(self):
         self.assertEqual(ie.emission_bandwidth_hz("2K70J3E"), 2700.0)
         self.assertEqual(ie.emission_bandwidth_hz("36M0G7W"), 36e6)

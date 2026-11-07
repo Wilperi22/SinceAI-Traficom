@@ -51,6 +51,14 @@ CONCERN_PRIORITY = ["SUB_QA_EXCEEDANCE", "LIMIT_NOT_APPLICABLE", "WORST_CASE_ISS
 # M4 services that are terrestrial (receivers on Finnish territory), for the no-limit screen.
 TERRESTRIAL_M4 = r"FIXED|MOBILE|BROADCASTING|AERONAUTICAL|MARITIME|RADIOLOCATION|RADIONAVIGATION|AMATEUR|METEOROLOGICAL AIDS"
 
+
+def is_terrestrial_m4(services: pd.Series) -> pd.Series:
+    """True for M4 rows of a terrestrial service. Each M4 row holds one service; satellite
+    services ('MOBILE-SATELLITE', 'FIXED SATELLITE', ...) contain a terrestrial service name
+    as a substring and must be excluded explicitly (GitHub issue #1)."""
+    text = services.fillna("").str.upper()
+    return text.str.contains(TERRESTRIAL_M4) & ~text.str.contains("SATELLITE")
+
 BR_SQL = """
 SELECT g.ntc_id, g.grp_id, g.fdg_reg, g.freq_min, g.freq_max, f.fdg_prov
 FROM grp g JOIN notice n ON n.ntc_id = g.ntc_id LEFT JOIN fdg_ref f ON f.grp_id = g.grp_id
@@ -381,7 +389,7 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
                          index=cand.index)
     # Traficom: real Finnish use = M4 (incl. licence-exempt) and the special-interest stations.
     lo, hi = cand["freq_min"].to_numpy()[:, None], cand["freq_max"].to_numpy()[:, None]
-    terr_m4 = m4[m4["Services_in_Finland"].fillna("").str.upper().str.contains(TERRESTRIAL_M4)]
+    terr_m4 = m4[is_terrestrial_m4(m4["Services_in_Finland"])]
     in_finnish_use = pd.Series(((stations["freq_min_mhz"].to_numpy() < hi) &
                                 (stations["freq_max_mhz"].to_numpy() > lo)).any(axis=1) |
                                ((terr_m4["freq_min_mhz"].to_numpy() < hi) &

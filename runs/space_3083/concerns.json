@@ -284,7 +284,7 @@
   "finnish_station_id":"",
   "m4_service":"FIXED SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
-  "reason":"PFD -150.2 dB(W\/m2) in 4 kHz at 7.4 deg elevation is 1.4 dB below RR Table 21-4 limit -148.8 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 40.0 dBi toward Finland); 2560 combination(s) in rows 10700_11700_FSS_GSO, 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_GSO, 42000_42500_FSS_BSS_GSO, SCREEN_NO_LIMIT",
+  "reason":"PFD -150.2 dB(W\/m2) in 4 kHz at 7.4 deg elevation is 1.4 dB below RR Table 21-4 limit -148.8 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 40.0 dBi toward Finland); 1628 combination(s) in rows 10700_11700_FSS_GSO, 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_GSO, 42000_42500_FSS_BSS_GSO, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
  {
@@ -776,8 +776,8 @@
   "orbit":"NGSO",
   "gso_longitude":null,
   "altitude_km":500.0,
-  "frequency_mhz":"137.0095-137.0345",
-  "beam_name":"GRIDVT1",
+  "frequency_mhz":"401.8875-401.9125",
+  "beam_name":"GRIDUT0",
   "station_class":"ET",
   "service":"EESS\/SO",
   "emission":"25K0F1D--",
@@ -794,9 +794,9 @@
   "rr_reference":"RR Art. 21 \/ App. 5: no limit or threshold for this band\/service",
   "br_finding":"",
   "finnish_station_id":"",
-  "m4_service":"METEOROLOGICAL-SATELLITE (SPACE-TO-EARTH); MOBILE-SATELLITE (SPACE-TO-EARTH); SPACE OPERATION (SPACE-TO-EARTH) ",
+  "m4_service":"MOBILE; METEOROLOGICAL-SATELLITE (EARTH-TO-SPACE); EARTH EXPLORATION-SATELLITE (EARTH-TO-SPACE); METEOROLOGICAL AIDS",
   "result_class":"NO_LIMIT_HIGH_PFD",
-  "reason":"No RR Table 21-4 limit for this band; PFD -131.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 19.0 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 2.0 dBi toward Finland); 5 combination(s) in rows SCREEN_NO_LIMIT",
+  "reason":"No RR Table 21-4 limit for this band; PFD -131.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 19.0 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 2.0 dBi toward Finland); 1 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
  {
