@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of India (Republic of) (IND)
+Date: 2026-11-07
+Subject: BR IFIC 3083 - satellite network INDSAT-NGSO-LEO-1, notice 126545288:
+         power flux-density over Finnish territory - exceeding RR Table 21-4
+
+Dear colleagues,
+
+The Administration of Finland has examined the API/A information for the satellite
+network INDSAT-NGSO-LEO-1 published in BR IFIC (Space Services) No. 3083. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the limits of Article 21, Table 21-4 of the
+Radio Regulations.
+
+Technical summary
+  Notice / network:           126545288 / INDSAT-NGSO-LEO-1
+  Orbit:                      non-geostationary orbit, altitude 650 km
+  Assignment:                 2200.0-2290.0 MHz, beam TTCSTX1, emission 2M00D7W--
+  Service (criterion row):    METSAT/SR/SO/EESS (2200_2300_SO_SR_EESS_METSAT)
+  Regulation:                 RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23)
+  e.i.r.p. in 4 kHz:          -16.5 dBW (emiss.pwr_ds_max x min(ref BW, emission BW) + peak gain)
+  Worst-case geometry:        elevation 90.0°, slant range 650 km
+  Calculated pfd:             -143.7 dB(W/m²) in 4 kHz
+  Table 21-4 limit:           -144.0 dB(W/m²) in 4 kHz
+  Exceedance:                 0.3 dB
+  Finnish services (M4):      FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)
+  Finnish stations in band:   408577(RX), 440557(RX), 452076(RX), 454152(RX), 467765(RX), 477781(RX), 477915(RX), 480622(RX), 800000(RX), 800001(RX), 800002(RX), 800003(RX) (+316 more, see report)
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by INDSAT-NGSO-LEO-1 over the territory of Finland, and
+  2. take the necessary measures (e.g. pfd masks, beam pointing restrictions) to ensure
+     compliance with RR No. 21.16 and Table 21-4, so that Finnish services are protected.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

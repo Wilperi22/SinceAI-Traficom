@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of China (People's Republic of) (CHN)
+Date: 2026-11-07
+Subject: BR IFIC 3083 - satellite network CHNTELESAT-G1-34.25W, notice 125520060 (and related notice 325520060):
+         power flux-density over Finnish territory - exceeding RR Table 21-4
+
+Dear colleagues,
+
+The Administration of Finland has examined the CR/C information for the satellite
+network CHNTELESAT-G1-34.25W published in BR IFIC (Space Services) No. 3083. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the limits of Article 21, Table 21-4 of the
+Radio Regulations.
+
+Technical summary
+  Notice / network:           125520060 / CHNTELESAT-G1-34.25W
+  Orbit:                      geostationary orbit at -34.2°
+  Assignment:                 17700.0-18200.0 MHz, beam KAFLD, emission 500MG7W--
+  Service (criterion row):    FSS/ISS/METSAT (17700_19300_FSS_ISS_METSAT)
+  Regulation:                 RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23), footnote 14, 15 (21.16.6A, 21.16.6B); fn 13 X = 0 for NGSO FSS
+  e.i.r.p. in 1 MHz:          50.0 dBW (emiss.pwr_ds_max x min(ref BW, emission BW) + peak gain)
+  Worst-case geometry:        elevation 5.0°, slant range 41127 km
+  Calculated pfd:             -113.3 dB(W/m²) in 1 MHz
+  Table 21-4 limit:           -115.0 dB(W/m²) in 1 MHz
+  Exceedance:                 1.7 dB
+  Finnish services (M4):      FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH); FIXED SATELLITE (SPACE-TO-EARTH)
+  Finnish stations in band:   603413(RX), 607797(RX), 616722(RX), 628219(RX), 628728(RX), 632251(RX), 632476(RX), 637357(RX), 643173(RX), 647668(RX), 600529(TX), 601452(TX) (+8 more, see report)
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by CHNTELESAT-G1-34.25W over the territory of Finland, and
+  2. take the necessary measures (e.g. pfd masks, beam pointing restrictions) to ensure
+     compliance with RR No. 21.16 and Table 21-4, so that Finnish services are protected.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

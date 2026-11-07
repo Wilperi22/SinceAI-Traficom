@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of China (People's Republic of) (CHN)
+Date: 2026-11-07
+Subject: BR IFIC 3083 - satellite network SIGNSAT-NGSO, notice 125512119:
+         power flux-density over Finnish territory - RR No. 9.14 coordination threshold exceeded
+
+Dear colleagues,
+
+The Administration of Finland has examined the Notification (11.2) information for the satellite
+network SIGNSAT-NGSO published in BR IFIC (Space Services) No. 3083. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the coordination threshold of RR Appendix 5, so that coordination with Finland is required
+under No. 9.14 of the Radio Regulations.
+
+Technical summary
+  Notice / network:           125512119 / SIGNSAT-NGSO
+  Orbit:                      non-geostationary orbit, altitude 880 km
+  Assignment:                 1525.0-1559.0 MHz, beam LD1, emission 8M00G9W--
+  Service (criterion row):    MSS (AP5_1518_1530_MSS)
+  Regulation:                 RR Ed. 2024 Vol. 2 App. 5 Annex 1 Table 5-2 (No. 9.14)
+  e.i.r.p. in 1 MHz:          31.4 dBW (s_beam notified peak e.i.r.p. in ref. BW)
+  Worst-case geometry:        elevation 90.0°, slant range 880 km
+  Calculated pfd:             -98.5 dB(W/m²) in 1 MHz
+  App. 5 threshold:           -118.0 dB(W/m²) in 1 MHz
+  Exceedance:                 19.5 dB
+  Finnish services (M4):      MOBILE-SATELLITE (SPACE-TO-EARTH)
+  Finnish stations in band:   none in the special-interest list
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by SIGNSAT-NGSO over the territory of Finland, and
+  2. effect coordination with the Administration of Finland under RR No. 9.14 before the
+     assignments are notified.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

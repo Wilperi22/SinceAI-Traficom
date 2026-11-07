@@ -1,0 +1,44 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Viet Nam (Socialist Republic of) (VTN)
+Date: 2026-11-07
+Subject: BR IFIC 3083 - satellite network VSAR-03, notice 126545311:
+         power flux-density over Finnish territory - exceeding RR Table 21-4
+
+Dear colleagues,
+
+The Administration of Finland has examined the API/A information for the satellite
+network VSAR-03 published in BR IFIC (Space Services) No. 3083. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds the limits of Article 21, Table 21-4 of the
+Radio Regulations.
+
+Technical summary
+  Notice / network:           126545311 / VSAR-03
+  Orbit:                      non-geostationary orbit, altitude 525 km
+  Assignment:                 2242.0-2243.0 MHz, beam TMS, emission 1M00G1D-N
+  Service (criterion row):    METSAT/SR/SO/EESS (2200_2300_SO_SR_EESS_METSAT)
+  Regulation:                 RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23)
+  e.i.r.p. in 4 kHz:          -13.0 dBW (emiss.pwr_ds_max x min(ref BW, emission BW) + peak gain)
+  Worst-case geometry:        elevation 90.0°, slant range 525 km
+  Calculated pfd:             -138.4 dB(W/m²) in 4 kHz
+  Table 21-4 limit:           -144.0 dB(W/m²) in 4 kHz
+  Exceedance:                 5.6 dB
+  Finnish services (M4):      FIXED
+  Finnish stations in band:   800025(RX), 800026(RX), 800027(RX), 800028(RX), 800029(RX), 800085(RX), 800086(RX), 800087(RX), 800088(RX), 800089(RX), 800145(RX), 800146(RX) (+42 more, see report)
+
+Method: pfd = e.i.r.p. - 10·log10(4πd²), evaluated over Finnish territory at every reachable
+angle of arrival; the limit is the angle-dependent value of the cited regulation. The calculation assumes
+peak antenna gain toward Finland and is therefore a worst case.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the pfd values produced by VSAR-03 over the territory of Finland, and
+  2. take the necessary measures (e.g. pfd masks, beam pointing restrictions) to ensure
+     compliance with RR No. 21.16 and Table 21-4, so that Finnish services are protected.
+
+The Administration of Finland reserves its rights with respect to protection of its
+terrestrial and space services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space
