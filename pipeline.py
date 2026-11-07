@@ -506,4 +506,8 @@ def use_project_venv() -> None:
 
 if __name__ == "__main__":
     use_project_venv()
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        log("stopped by user")
+        sys.exit(130)
