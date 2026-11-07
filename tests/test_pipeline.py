@@ -239,6 +239,23 @@ class SpaceFindings(unittest.TestCase):
         self.assertTrue(np.allclose(recomputed, r["margin_of_exceedance"], atol=0.02))
 
 
+class PipelineIO(unittest.TestCase):
+    def test_refresh_m4_atomic_and_paged(self):
+        """Issue #13: M4 refresh follows OData paging and replaces m4.json atomically."""
+        import io, json as js, tempfile
+        from unittest import mock
+        import pipeline
+        pages = {pipeline.M4_URL: {"value": [{"ID": i} for i in range(600)], "@odata.nextLink": "page2"},
+                 "page2": {"value": [{"ID": i} for i in range(600, 1200)]}}
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch("urllib.request.urlopen", lambda url, timeout=0: io.BytesIO(js.dumps(pages[url]).encode())):
+            target = Path(tmp) / "m4.json"
+            target.write_text("old")
+            pipeline.refresh_m4(target)
+            self.assertEqual(len(js.loads(target.read_text())["value"]), 1200)
+            self.assertFalse((Path(tmp) / "m4.json.partial").exists())
+
+
 class TerrestrialPhysics(unittest.TestCase):
     def test_free_space_reference(self):
         # P.1546: 1 kW e.r.p. free-space field 106.9 - 20log(d) dB(uV/m)

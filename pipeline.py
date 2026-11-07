@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import sqlite3
 import sys
@@ -218,7 +219,11 @@ def refresh_m4(path: Path) -> None:
         url = page.get("@odata.nextLink")
     if len(rows) < 1000:
         raise RuntimeError(f"M4 download returned only {len(rows)} rows; keeping {path.name}")
-    path.write_text(json.dumps({"@odata.context": M4_URL, "value": rows}, ensure_ascii=False), encoding="utf-8")
+    # All pages are in memory before anything is written; write to a temporary file and swap it
+    # in atomically so a crash or full disk mid-write never leaves a truncated m4.json (issue #13).
+    partial = path.with_suffix(path.suffix + ".partial")
+    partial.write_text(json.dumps({"@odata.context": M4_URL, "value": rows}, ensure_ascii=False), encoding="utf-8")
+    os.replace(partial, path)
     log(f"M4 refreshed from {M4_URL}: {len(rows)} rows")
 
 
