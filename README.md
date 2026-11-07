@@ -14,8 +14,7 @@ This repository contains the data processing pipeline and analysis tools for the
 
 | File / Directory | Description |
 |------------------|-------------|
-| `convert_mdb.py` | Python script to convert ITU BR IFIC MDB (Microsoft Access) database to SQLite. Updated to process **IFIC #3074**. |
-| `create_views.py` | Creates analytical SQL views on the SQLite database for Space IFIC #3074 PFD (Power Flux Density) input analysis. |
+| `process_itu_mdb.py` | **Unified script**: converts any ITU BR IFIC MDB to SQLite and creates analytical views. Accepts CLI arguments for input/output paths. |
 | `schema.txt` | Full database schema export (DDL) from the converted IFIC #3074 SQLite database. |
 | `.gitignore` | Excludes large binary artifacts (`ific3074.sqlite` ~356 MB) from version control. |
 | `Traficom materials/` | Original challenge brief, frequency dataset, and checksums provided by Traficom. |
@@ -42,36 +41,36 @@ Located in `Traficom materials/`:
 
 ---
 
-## Data Pipeline
+## Data Pipeline (`process_itu_mdb.py`)
 
-### 1. Convert MDB → SQLite (`convert_mdb.py`)
-
-```bash
-python convert_mdb.py
-```
-
-- Input: `/home/niksu/Downloads/ific3074.mdb` (ITU BR IFIC #3074 Microsoft Access database)
-- Output: `ific3074.sqlite` (SQLite database, **~356 MB**, git-ignored)
-- Uses `mdb-tools` (`mdb-tables`, `mdb-schema`, `mdb-export`) for conversion
-- Configurable via `MDB_PATH` and `OUTPUT_DB` constants at top of script
-
-### 2. Create Analytical Views (`create_views.py`)
+Single script that handles both conversion and view creation:
 
 ```bash
-python create_views.py
+# Using defaults (ific3074.mdb in ~/Downloads, output to project dir)
+python process_itu_mdb.py
+
+# Custom input/output
+python process_itu_mdb.py /path/to/ific3083.mdb /path/to/output_dir
+
+# Only custom input (output dir uses default)
+python process_itu_mdb.py /path/to/ific3083.mdb
 ```
 
-- Connects to `ific3074.sqlite`
-- Creates view `vw_space_3074_pfd_inputs` joining:
-  - `notice` (ntc_id, adm, wic_no, ntf_rsn, st_cur)
-  - `grp` (grp_id, beam_name, emi_rcp)
-  - `freq` (freq_min, freq_max, freq_mhz)
-  - `emiss` (pwr_ds_max)
-  - `s_beam` (gain → peak_antenna_gain)
-  - `geo` (long_nom → gso_longitude)
-  - `tr_aff_ntw` (coord_prov → affected_country, agree_st)
-- Filters: `wic_no = 3074` AND `emi_rcp = 'E'` (Emission/Reception)
-- Outputs sample query results via pandas
+### What it does:
+
+1. **Converts MDB → SQLite** using `mdb-tools` (`mdb-tables`, `mdb-schema`, `mdb-export`)
+   - Output filename derived from input (e.g., `ific3083.mdb` → `ific3083.sqlite`)
+   - Performance-tuned PRAGMAs for fast bulk loading
+   - Transaction-wrapped imports with progress logging
+
+2. **Creates analytical view** (conditional)
+   - Only runs if required Space IFIC tables exist: `notice`, `grp`, `freq`, `emiss`, `s_beam`, `geo`, `tr_aff_ntw`
+   - IFIC number auto-extracted from filename (e.g., `ific3074` → 3074)
+   - Creates view `vw_space_<NUM>_pfd_inputs` joining all relevant tables
+   - Filters: `wic_no = <IFIC_NUM>` AND `emi_rcp = 'E'` (Emission/Reception)
+
+3. **Runs test query** (if pandas available)
+   - Outputs sample rows from the created view
 
 ---
 
@@ -96,14 +95,17 @@ Complete DDL export including all tables and indexes. Key tables:
 # 1. Install mdb-tools (Ubuntu/Debian)
 sudo apt-get install mdb-tools
 
-# 2. Download IFIC #3074 MDB from ITU BR (place in ~/Downloads/ific3074.mdb)
+# 2. Download IFIC MDB from ITU BR (e.g., place in ~/Downloads/ific3074.mdb)
 
-# 3. Convert to SQLite
-python convert_mdb.py
-
-# 4. Create analytical views
-python create_views.py
+# 3. Run unified processing script
+python process_itu_mdb.py
 ```
+
+**Default paths:**
+- Input: `/home/niksu/Downloads/ific3074.mdb`
+- Output: `/home/niksu/Documents/SinceAI-Traficom/ific3074.sqlite`
+
+Override by passing arguments: `python process_itu_mdb.py <input.mdb> [output_dir]`
 
 ---
 
