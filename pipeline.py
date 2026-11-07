@@ -3,7 +3,10 @@
 
     python pipeline.py                                   # process every new file in inbox/
     python pipeline.py ific3080.zip brific3082.mdb       # process given files
-    python pipeline.py 3080                              # download Space IFIC 3080 from the ITU and process it
+    python pipeline.py 3080                              # download Space + Terrestrial IFIC 3080 from the ITU
+    python pipeline.py s3080 t3079                       # only the Space / only the Terrestrial part
+    python pipeline.py --watch                           # fetch + process any newly published issue (cron)
+    python pipeline.py --watch --every 6                 # keep watching, checking every 6 hours
     python pipeline.py --refresh-m4 inbox/*.zip          # also refresh M4 from the Traficom API
     python pipeline.py --report-only                     # rebuild report.html from stored runs
 
@@ -33,6 +36,7 @@ import sqlite3
 import sys
 import time
 import traceback
+import urllib.error
 import urllib.request
 import zipfile
 from datetime import datetime, timezone
@@ -47,6 +51,8 @@ RUNS = ROOT / "runs"
 RESULTS_DB = ROOT / "results.sqlite"
 M4_URL = "https://opendata.traficom.fi/api/v13/Taajuusjakotaulukko"
 ITU_SPACE_IFIC_URL = "https://www.itu.int/sns/ific10/ific{num}.zip"   # ITU BR Space IFIC download
+ITU_TERRESTRIAL_IFIC_URL = "https://www.itu.int/en/ITU-R/terrestrial/brific/BRIFIC/MDB/brific{num}.zip"
+URLS = {"space": ITU_SPACE_IFIC_URL, "terrestrial": ITU_TERRESTRIAL_IFIC_URL}
 DEFAULTS = {
     "m4": ROOT / "m4.json",
     "limits": ROOT / "pfd.json",
@@ -102,21 +108,89 @@ def to_sqlite(source: Path, digest: str) -> Path:
     return cached
 
 
-def download(spec: str) -> Path:
-    """IFIC number (e.g. 3080) or https URL -> downloaded zip in inbox/ (kept for the audit trail)."""
-    url = ITU_SPACE_IFIC_URL.format(num=spec) if spec.isdigit() else spec
+def published(url: str) -> bool:
+    """True if the ITU already serves this file (HEAD 200); False on 404 (issue not published yet)."""
+    request = urllib.request.Request(url, method="HEAD")
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return response.status == 200
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return False
+        raise
+
+
+def download(url: str, attempts: int = 5) -> Path:
+    """Download url into inbox/, resuming a partial file (HTTP Range) after interruptions.
+
+    Large BR IFIC files take long to download; the watcher fetches them as soon as they are
+    published, so nobody has to wait for the download (Traficom feedback)."""
     target = INBOX / Path(url.split("?")[0]).name
     if target.exists():
         log(f"  already downloaded {target.relative_to(ROOT)}")
         return target
-    log(f"  downloading {url}")
     INBOX.mkdir(exist_ok=True)
     partial = target.with_suffix(target.suffix + ".partial")
-    with urllib.request.urlopen(url, timeout=600) as response, partial.open("wb") as out:
-        shutil.copyfileobj(response, out)
-    partial.rename(target)
-    log(f"  saved {target.relative_to(ROOT)} ({target.stat().st_size >> 20} MB)")
-    return target
+    for attempt in range(1, attempts + 1):
+        have = partial.stat().st_size if partial.exists() else 0
+        request = urllib.request.Request(url, headers={"Range": f"bytes={have}-"} if have else {})
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                resumed = response.status == 206
+                total = int(response.headers.get("Content-Length", 0)) + (have if resumed else 0)
+                log(f"  downloading {url} ({total >> 20} MB" + (f", resuming at {have >> 20} MB)" if resumed else ")"))
+                with partial.open("ab" if resumed else "wb") as out:
+                    done, next_report = (have if resumed else 0), 0.1
+                    while chunk := response.read(1 << 20):
+                        out.write(chunk)
+                        done += len(chunk)
+                        if total and done / total >= next_report:
+                            log(f"    {done / total:.0%} ({done >> 20}/{total >> 20} MB)")
+                            next_report += 0.1
+            if total and partial.stat().st_size != total:
+                raise IOError(f"incomplete download: {partial.stat().st_size} of {total} bytes")
+            partial.rename(target)
+            log(f"  saved {target.relative_to(ROOT)} ({target.stat().st_size >> 20} MB)")
+            return target
+        except (OSError, urllib.error.URLError) as exc:
+            if attempt == attempts:
+                raise
+            log(f"  download interrupted ({type(exc).__name__}: {exc}); retry {attempt}/{attempts - 1} in {10 * attempt} s")
+            time.sleep(10 * attempt)
+
+
+def resolve_spec(spec: str) -> list[str]:
+    """'3084' -> Space + Terrestrial URLs, 's3084' / 't3084' -> one of them, http(s) URL -> itself."""
+    if spec.startswith(("http://", "https://")):
+        return [spec]
+    kinds = {"s": ["space"], "t": ["terrestrial"]}.get(spec[0].lower(), ["space", "terrestrial"])
+    number = spec[1:] if spec[0].lower() in "st" else spec
+    return [URLS[k].format(num=int(number)) for k in kinds]
+
+
+def is_issue_spec(spec: str) -> bool:
+    return spec.startswith(("http://", "https://")) or spec.isdigit() or (
+        len(spec) > 1 and spec[0].lower() in "st" and spec[1:].isdigit())
+
+
+def watch_once(lookahead: int = 3) -> list[Path]:
+    """Download every Space/Terrestrial issue published after the latest one processed."""
+    latest = 0
+    if RESULTS_DB.exists():
+        with sqlite3.connect(RESULTS_DB) as con:
+            latest = con.execute("SELECT COALESCE(MAX(ific), 0) FROM runs").fetchone()[0]
+    if not latest:
+        raise RuntimeError("no processed issue yet - run e.g. 'pipeline.py 3083' once to set the starting point")
+    found = []
+    for number in range(latest + 1, latest + 1 + lookahead):
+        for kind, template in URLS.items():
+            url = template.format(num=number)
+            if published(url):
+                log(f"new {kind} IFIC {number} published")
+                found.append(download(url))
+    if not found:
+        log(f"no new IFIC after {latest} published yet (checked {latest + 1}-{latest + lookahead})")
+    return found
 
 
 def detect(db: Path) -> tuple[str, int]:
@@ -188,7 +262,7 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
         if tr.P1546 is None:
             log("  WARNING: Py1546 not installed - terrestrial results are free-space REVIEW only (--allow-free-space)")
         alerts, concerns = tr.terrestrial_report(db, stations, m4, ific, cfg.min_exceedance_db,
-                                                 tr.NEAR_LIMIT_DB, border, audit)
+                                                 tr.NEAR_LIMIT_DB, border, audit, previous_databases(ific))
         for _, f in alerts.iterrows():
             (out / "letters" / f"T_{f['country']}_{f['notice_id']}.txt").write_text(
                 lt.terrestrial_letter(f, ific), encoding="utf-8")
@@ -200,7 +274,7 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
     (out / "audit.txt").write_text("\n".join(audit) + "\n", encoding="utf-8")
     run = {"kind": kind, "ific": ific, "run_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "source": source.name, "source_sha256": digest, "n_alerts": len(alerts), "n_concerns": len(concerns),
-           "seconds": round(seconds, 1)}
+           "seconds": round(seconds, 1), "sqlite_path": str(db)}
     write_workbook(out / f"{kind}_{ific}_results.xlsx", kind, ific, run, alerts, concerns)
     store(run, alerts, concerns)
     log(f"  {kind} IFIC {ific}: {len(alerts)} alerts, {len(concerns)} concerns -> {out.relative_to(ROOT)}/ "
@@ -213,7 +287,8 @@ SPACE_FIRST = ["priority", "network_name", "country", "notice_id", "related_noti
                "reference_bandwidth", "elevation_deg", "rr_reference", "br_finding", "priority_reason", "reason"]
 TERRA_FIRST = ["priority", "site_name", "country", "notice_id", "station_class", "change_type", "frequency_mhz",
                "result_class", "margin_db", "field_strength_dbuv_m", "threshold_dbuv_m", "distance_km",
-               "worst_point_type", "coordination_with_fin", "priority_reason", "reason"]
+               "worst_point_type", "coordination_with_fin", "change_vs_previous_issues", "issue_history",
+               "priority_reason", "reason"]
 METHOD = {
     "space": [
         ("Criterion", "ITU RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23), angle-of-arrival dependent, "
@@ -241,6 +316,8 @@ METHOD = {
         ("Priority Medium", "1-6 dB"),
         ("Priority Low", "< 1 dB (within modelling uncertainty)"),
         ("Coordination", "Coordination recorded with Finland in the IFIC is reported, not treated as closed"),
+        ("Earlier issues", "Each assignment (administration + reference + station class) is looked up in the earlier "
+                           "Terrestrial IFICs processed: NEW, REPUBLISHED (same frequency and site) or MODIFIED"),
     ],
 }
 
@@ -259,10 +336,10 @@ def write_workbook(path: Path, kind: str, ific: int, run: dict, alerts: pd.DataF
     summary += [("", ""), ("How to read", "Alerts: calculated exceedance of a cited criterion, sorted by priority. "
                                           "Concerns: screening cases below alert level. Draft letters: letters/ folder.")]
     with pd.ExcelWriter(path, engine="openpyxl") as xw:
-        pd.DataFrame(summary, columns=["Item", "Value"]).to_excel(xw, "Summary", index=False)
-        order(alerts).to_excel(xw, "Alerts", index=False)
-        order(concerns).to_excel(xw, "Concerns", index=False)
-        pd.DataFrame(METHOD[kind], columns=["Topic", "Description"]).to_excel(xw, "Method", index=False)
+        pd.DataFrame(summary, columns=["Item", "Value"]).to_excel(xw, sheet_name="Summary", index=False)
+        order(alerts).to_excel(xw, sheet_name="Alerts", index=False)
+        order(concerns).to_excel(xw, sheet_name="Concerns", index=False)
+        pd.DataFrame(METHOD[kind], columns=["Topic", "Description"]).to_excel(xw, sheet_name="Method", index=False)
         for ws in xw.book.worksheets:
             ws.freeze_panes = "A2"
             ws.auto_filter.ref = ws.dimensions
@@ -286,8 +363,11 @@ def store(run: dict, alerts: pd.DataFrame, concerns: pd.DataFrame) -> None:
                 name TEXT, result_class TEXT, margin_db REAL, data TEXT);
             CREATE INDEX IF NOT EXISTS findings_issue ON findings (kind, ific);""")
         con.execute("DELETE FROM findings WHERE kind = ? AND ific = ?", (run["kind"], run["ific"]))
-        con.execute("INSERT OR REPLACE INTO runs VALUES (:kind, :ific, :run_utc, :source, :source_sha256, "
-                    ":n_alerts, :n_concerns, :seconds)", run)
+        if "sqlite_path" not in {r[1] for r in con.execute("PRAGMA table_info(runs)")}:
+            con.execute("ALTER TABLE runs ADD COLUMN sqlite_path TEXT")
+        con.execute("INSERT OR REPLACE INTO runs (kind, ific, run_utc, source, source_sha256, n_alerts, n_concerns, "
+                    "seconds, sqlite_path) VALUES (:kind, :ific, :run_utc, :source, :source_sha256, :n_alerts, "
+                    ":n_concerns, :seconds, :sqlite_path)", run)
         for tier, frame in (("alert", alerts), ("concern", concerns)):
             margin = "margin_of_exceedance" if run["kind"] == "space" else "margin_db"
             name = "network_name" if run["kind"] == "space" else "site_name"
@@ -295,6 +375,18 @@ def store(run: dict, alerts: pd.DataFrame, concerns: pd.DataFrame) -> None:
                 con.execute("INSERT INTO findings VALUES (?,?,?,?,?,?,?,?,?)",
                             (run["kind"], run["ific"], tier, str(rec.get("notice_id")), rec.get("country"),
                              rec.get(name), rec.get("result_class"), rec.get(margin), json.dumps(rec, ensure_ascii=False)))
+
+
+def previous_databases(ific: int) -> dict[int, Path]:
+    """Databases of earlier Terrestrial IFICs processed before, for the consecutive-issue comparison."""
+    if not RESULTS_DB.exists():
+        return {}
+    with sqlite3.connect(RESULTS_DB) as con:
+        if "sqlite_path" not in {r[1] for r in con.execute("PRAGMA table_info(runs)")}:
+            return {}
+        rows = con.execute("SELECT ific, sqlite_path FROM runs WHERE kind = 'terrestrial' AND ific < ? "
+                           "AND sqlite_path IS NOT NULL", (ific,)).fetchall()
+    return {n: Path(p) for n, p in rows if Path(p).is_file()}
 
 
 def already_processed(digest: str) -> bool:
@@ -307,13 +399,17 @@ def already_processed(digest: str) -> bool:
             return False
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("inputs", nargs="*", help="IFIC files (.zip/.mdb/.sqlite), Space IFIC numbers to download "
                                                   "from the ITU (e.g. 3080) or https URLs; default: inbox/*")
     parser.add_argument("--refresh-m4", action="store_true", help="Download the current M4 table first")
     parser.add_argument("--force", action="store_true", help="Re-process files already in results.sqlite")
     parser.add_argument("--report-only", action="store_true", help="Only rebuild report.html")
+    parser.add_argument("--watch", action="store_true",
+                        help="Download and process every IFIC published after the latest processed one")
+    parser.add_argument("--every", type=float, default=0,
+                        help="With --watch: keep running and check again every N hours")
     parser.add_argument("--min-exceedance-db", type=float, default=0.0)
     parser.add_argument("--exclude-notifications", action="store_true")
     parser.add_argument("--m4", type=Path, default=DEFAULTS["m4"])
@@ -323,8 +419,10 @@ def main() -> None:
     parser.add_argument("--allow-free-space", action="store_true",
                         help="Run terrestrial screening without Py1546 (free-space upper bound, REVIEW only)")
     parser.add_argument("--report-issues", type=int, default=12, help="Issues per kind kept in report.html")
-    cfg = parser.parse_args()
+    return parser.parse_args()
 
+
+def run_once(cfg: argparse.Namespace) -> None:
     if cfg.refresh_m4:
         try:
             refresh_m4(cfg.m4)
@@ -335,14 +433,20 @@ def main() -> None:
         INBOX.mkdir(exist_ok=True)
         inputs = []
         for spec in cfg.inputs:
-            if spec.isdigit() or spec.startswith(("http://", "https://")):
-                try:
-                    inputs.append(download(spec))
-                except Exception as exc:
-                    log(f"{spec}: download FAILED: {type(exc).__name__}: {exc}")
+            if is_issue_spec(spec):
+                for url in resolve_spec(spec):
+                    try:
+                        if published(url):
+                            inputs.append(download(url))
+                        else:
+                            log(f"{url}: not published (404) - skipped")
+                    except (OSError, ValueError) as exc:
+                        log(f"{url}: download FAILED: {type(exc).__name__}: {exc}")
             else:
                 inputs.append(Path(spec))
-        if not cfg.inputs:
+        if cfg.watch:
+            inputs += watch_once()
+        if not cfg.inputs and not cfg.watch:
             inputs = sorted(p for p in INBOX.iterdir() if p.suffix.lower() in
                             (".zip", ".mdb", ".accdb", ".sqlite", ".db"))
         if not inputs:
@@ -368,6 +472,15 @@ def main() -> None:
 
     import build_report
     build_report.build(ROOT / "report.html", max_issues=cfg.report_issues)
+
+
+def main() -> None:
+    cfg = parse_args()
+    run_once(cfg)
+    while cfg.watch and cfg.every > 0:
+        log(f"next check in {cfg.every:g} h")
+        time.sleep(cfg.every * 3600)
+        run_once(cfg)
 
 
 if __name__ == "__main__":

@@ -224,7 +224,7 @@ class SpaceFindings(unittest.TestCase):
         r = self.report
         self.assertTrue((r["margin_of_exceedance"] >= ie.MIN_EXCEEDANCE_MARGIN_DB).all())
         self.assertTrue(r["rr_reference"].str.contains("Table 21-4|App. 5").all())
-        self.assertTrue(r["result_class"].isin(["CRITICAL ERROR", "COORDINATION REQUIRED"]).all())
+        self.assertTrue(r["result_class"].isin(["EXCEEDS LIMIT", "COORDINATION REQUIRED"]).all())
         ap5 = r[r["result_class"] == "COORDINATION REQUIRED"]
         self.assertTrue(ap5["table21_4_row"].str.startswith("AP5_").all())
         self.assertTrue((r["elevation_deg"] >= 0).all())
@@ -249,6 +249,13 @@ class TerrestrialPhysics(unittest.TestCase):
             for d, val in zip((1, 10, 50, 100, 300, 1000), e):
                 self.assertLessEqual(val, 106.9 - 20 * math.log10(d) + 0.01, (f, d))
             self.assertEqual(e, sorted(e, reverse=True), f)
+
+    @unittest.skipIf(tr.P1546 is None, "Py1546 not installed")
+    def test_short_low_sea_path_does_not_crash(self):
+        """Terrestrial IFIC 3075: 14.6 km all-sea path from a 1.5 m mobile crashed Py1546 (h1 None)."""
+        e = tr.field_strength_1kw(148.575, 1.5, [14.583], ["Cold"])
+        self.assertTrue(np.isfinite(e))
+        self.assertAlmostEqual(e, tr.field_strength_1kw(148.575, 3.0, [14.583], ["Cold"]), places=6)
 
     @unittest.skipIf(tr.P1546 is None, "Py1546 not installed")
     def test_cold_sea_propagates_further_than_land(self):
@@ -300,6 +307,15 @@ class TerrestrialFindings(unittest.TestCase):
         self.assertFalse((r["country"] == "FIN").any())
         self.assertTrue((r["distance_km"] <= tr.MAX_DISTANCE_KM).all())
         self.assertFalse(r["change_type"].isin(["WITHDRAWN", "RECORDED"]).any())
+
+    def test_consecutive_issue_comparison(self):
+        """3077 is compared with 3075 and 3076 (brief: new / modified / withdrawn across issues)."""
+        run = ROOT / "runs" / "terrestrial_3077"
+        if not run.exists():
+            self.skipTest("terrestrial 3077 not processed")
+        self.assertIn("Compared with earlier Terrestrial IFICs [3075, 3076]", (run / "audit.txt").read_text())
+        rows = pd.concat([pd.read_csv(run / "alerts.csv"), pd.read_csv(run / "concerns.csv")])
+        self.assertTrue(rows["change_vs_previous_issues"].isin(["NEW", "REPUBLISHED", "MODIFIED"]).all())
 
     def test_excel_bandwidth_rule(self):
         st = ie.load_stations(EXCEL)

@@ -2,7 +2,7 @@ SPACE IFIC 3074 - pipeline run
 Source: ific3074.sqlite (sha256 a63ead900ebd90e55fcf9629de7d8d8501a8db16aacebabe7a954a6a1287cbf9)
 Database: ific3074.sqlite
 Alert gate: margin >= 0 dB; near-limit 6 dB
-Run (UTC): 2026-11-07T17:42:37+00:00
+Run (UTC): 2026-11-07T17:53:23+00:00
 Input ific3074.sqlite: sha256 a63ead900ebd90e55fcf9629de7d8d8501a8db16aacebabe7a954a6a1287cbf9 (348741632 bytes)
 Input pfd.json: sha256 66b6bf5430b71c29cee0ed0ab7a72676029e4932d5e7d20b3a90f3ecc3bf0f61 (13514 bytes)
 Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
@@ -20,4 +20,4 @@ Evaluated 113878 group/emission/row combinations over 117 notices; exceedances >
 ITU BR findings X/21.16 in this issue: 3 notices; alerts here: 1; listed as BR_UNFAVOURABLE_21_16 concerns: 2
 Concerns (separate CSV, networks without an alert): 48 - SUB_QA_EXCEEDANCE: 0, LIMIT_NOT_APPLICABLE: 1, WORST_CASE_ISS: 2, BR_UNFAVOURABLE_21_16: 2, NEAR_LIMIT: 27, NO_LIMIT_HIGH_PFD: 16
 Alert priority: High: 18, Medium: 14, Low: 2
-Exported 34 alerts and 48 concerns in 3.4 s
+Exported 34 alerts and 48 concerns in 3.3 s

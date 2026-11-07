@@ -529,11 +529,11 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
          f"exceedances >0 dB: {int((margin > 0).sum())}, >= {min_exceedance_db:g} dB: {int((margin >= min_exceedance_db).sum())} "
          f"in {cand.loc[margin >= min_exceedance_db, 'ntc_id'].nunique()} notices")
 
-    # Alerts: Table 21-4 hard-limit exceedances (CRITICAL ERROR) and RR No. 9.14 Appendix 5
+    # Alerts: Table 21-4 hard-limit exceedances (EXCEEDS LIMIT) and RR No. 9.14 Appendix 5
     # coordination-threshold exceedances (COORDINATION REQUIRED); one row per network, hard limits first.
     alerts_rows = cand[real & (cand["margin_of_exceedance"] >= min_exceedance_db)].copy()
     is_ap5 = alerts_rows["criterion"].eq("AP5") if "criterion" in alerts_rows else False
-    alerts_rows["alert_class"] = np.where(is_ap5, "COORDINATION REQUIRED", "CRITICAL ERROR")
+    alerts_rows["alert_class"] = np.where(is_ap5, "COORDINATION REQUIRED", "EXCEEDS LIMIT")
     alerts_rows["_priority"] = np.where(is_ap5, 1, 0)
     alerts = attach_victims(one_per_network(alerts_rows, "ALERT"), m4, stations)
 
@@ -677,7 +677,7 @@ def one_per_network(rows: pd.DataFrame, result_class: str | None,
         geo = f"PFD {r.pfd_dbw_m2:.1f} dB(W/m2) in {r.reference_bandwidth} at {r.elevation_deg:.1f} deg elevation"
         ap5 = getattr(r, "criterion", "") == "AP5"
         label = "RR Appendix 5 coordination threshold" if ap5 else "RR Table 21-4 limit"
-        if r.result_class == "CRITICAL ERROR":
+        if r.result_class == "EXCEEDS LIMIT":
             text = f"{geo} exceeds RR Table 21-4 limit {r.pfd_limit_dbw_m2:.1f} by {r.margin_of_exceedance:.1f} dB"
         elif r.result_class == "COORDINATION REQUIRED":
             text = (f"{geo} exceeds the RR Appendix 5 coordination threshold {r.pfd_limit_dbw_m2:.1f} by "

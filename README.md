@@ -17,10 +17,19 @@ cp ~/Downloads/<terrestrial IFIC>.zip inbox/ && .venv/bin/python pipeline.py   #
 xdg-open report.html
 ```
 
-Unattended every two weeks (cron):
+Fetch new issues automatically, as soon as the ITU publishes them (no one waits for the download):
+
+```bash
+.venv/bin/python pipeline.py 3083            # first run: Space + Terrestrial IFIC 3083 from the ITU
+.venv/bin/python pipeline.py --watch         # later: download + process every issue published since
+.venv/bin/python pipeline.py --watch --every 6   # or keep running, checking every 6 hours
+```
+
+Downloads resume after interruptions (HTTP Range), so large files survive network drops.
+Unattended (cron), e.g. every 6 hours:
 
 ```
-0 6 * * 1  cd /path/to/repo && .venv/bin/python pipeline.py --refresh-m4 >> pipeline.log 2>&1
+0 */6 * * *  cd /path/to/repo && .venv/bin/python pipeline.py --watch --refresh-m4 >> pipeline.log 2>&1
 ```
 
 ## Pipeline (`pipeline.py`)
@@ -52,6 +61,7 @@ Files already processed (same SHA-256) are skipped; `--force` re-runs them, `--r
 * Compared with **ECC T/R 25-08 A1.2.3** (20 dB(µV/m) in 25 kHz) along the Finnish land border and
   territorial sea (`geodata/`, built from Natural Earth 1:10m by `build_boundaries.py`; replace with the
   official dataset via `terrestrial.py --border-file`).
+* **Consecutive issues**: each assignment is looked up in the earlier Terrestrial IFICs processed (administration + reference + station class) and marked NEW, REPUBLISHED or MODIFIED, with its publication history.
 * Coordination with Finland recorded in the IFIC is reported, not treated as closed; trends by
   administration/class/band are in the audit.
 
@@ -75,7 +85,7 @@ from Finland. Margins are command-line options.
 .venv/bin/python -m unittest -v tests.test_pipeline
 ```
 
-30 tests: physics against reference values, independent hand calculations of real findings from the raw
+32 tests: physics against reference values, independent hand calculations of real findings from the raw
 IFIC tables (CSN-SSO, PAZ_2-A, Kostomuksha), RR footnote rules, BR cross-check, and invariants on the
 outputs. Each audit file records input SHA-256 hashes and model versions.
 

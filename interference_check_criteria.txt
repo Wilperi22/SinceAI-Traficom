@@ -1,3 +1,8 @@
+NOTE (2026-11-07): early working specification written before implementation.
+Implemented behaviour, outputs and file names are described in README.md and in the
+Method tab of report.html; result classes are EXCEEDS LIMIT / COORDINATION REQUIRED
+(alerts) and the concern classes listed there.
+
 INTERFERENCE CHECK CRITERIA
 ===========================
 

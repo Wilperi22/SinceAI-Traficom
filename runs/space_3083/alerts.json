@@ -27,7 +27,7 @@
   "br_finding":"A- x11",
   "finnish_station_id":"",
   "m4_service":"MOBILE-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+31.0 dB",
   "reason":"PFD -113.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 31.0 dB (worst case per Traficom guidance: peak gain 12.0 dBi toward Finland); 26 combination(s) in rows 1525_1530_SO_SR_EESS_METSAT, AP5_1518_1530_MSS, AP5_2160_2200_MSS_NGSO, AP5_2483.5_2500_MSS_NGSO"
@@ -60,7 +60,7 @@
   "br_finding":"A- x1",
   "finnish_station_id":"412266(RX)",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE; Amateur; FIXED; MOBILE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+22.9 dB; Finnish stations in band",
   "reason":"PFD -90.1 dB(W\/m2) in 1 MHz at 5.5 deg elevation exceeds RR Table 21-4 limit -113.0 by 22.9 dB (worst case per Traficom guidance: peak gain 44.6 dBi toward Finland); 1 combination(s) in rows 9900_10400_EESS_active"
@@ -93,7 +93,7 @@
   "br_finding":"A- x24",
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+19.7 dB",
   "reason":"PFD -107.3 dB(W\/m2) in 1 MHz at 5.0 deg elevation exceeds RR Table 21-4 limit -127.0 by 19.7 dB (worst case per Traficom guidance: peak gain 50.0 dBi toward Finland); 210 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 40500_42000_FSS_BSS_GSO, 42000_42500_FSS_BSS_GSO"
@@ -159,7 +159,7 @@
   "br_finding":"A- x732, N- x3 (X\/21.16)",
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+18.9 dB; ITU BR finding X\/21.16",
   "reason":"PFD -108.1 dB(W\/m2) in 1 MHz at 5.0 deg elevation exceeds RR Table 21-4 limit -127.0 by 18.9 dB (worst case per Traficom guidance: peak gain 55.0 dBi toward Finland); 9870 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 40500_42000_FSS_BSS_GSO, 42000_42500_FSS_BSS_GSO"
@@ -192,7 +192,7 @@
   "br_finding":"A- x147 (Q\/RS770)",
   "finnish_station_id":"603413(RX);607797(RX);616722(RX);628219(RX);628728(RX);632251(RX);632476(RX);637357(RX);643173(RX);647668(RX);600529(TX);601452(TX);602266(TX);605729(TX);613999(TX);614038(TX);616738(TX);623938(TX);631021(TX);634993(TX)",
   "m4_service":"FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH); FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+15.3 dB; Finnish stations in band",
   "reason":"PFD -89.7 dB(W\/m2) in 1 MHz at 90.0 deg elevation exceeds RR Table 21-4 limit -105.0 by 15.3 dB (worst case per Traficom guidance: peak gain 40.4 dBi toward Finland); 234 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, AP5_1518_1530_MSS, AP5_2160_2200_MSS_NGSO, AP5_2483.5_2500_MSS_NGSO"
@@ -225,7 +225,7 @@
   "br_finding":"",
   "finnish_station_id":"985264(RX);981446(RX);983375(RX);985046(RX)",
   "m4_service":"MOBILE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+11.8 dB; Finnish stations in band",
   "reason":"PFD -124.2 dB(W\/m2) in 1 MHz at 5.0 deg elevation exceeds RR Table 21-4 limit -136.0 by 11.8 dB (worst case per Traficom guidance: peak gain 46.0 dBi toward Finland); 30 combination(s) in rows 2500_2690_FSS_BSS_RDSS_MSS, AP5_2160_2200_MSS_NGSO"
@@ -258,7 +258,7 @@
   "br_finding":"A- x39",
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+11.5 dB",
   "reason":"PFD -107.1 dB(W\/m2) in 1 MHz at 11.3 deg elevation exceeds RR Table 21-4 limit -118.6 by 11.5 dB (worst case per Traficom guidance: peak gain 50.0 dBi toward Finland); 600 combination(s) in rows 13400_13650_FSS_GSO_R1, 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 40500_42000_FSS_BSS_GSO, 42000_42500_FSS_BSS_GSO"
@@ -291,7 +291,7 @@
   "br_finding":"A- x123",
   "finnish_station_id":"",
   "m4_service":"FIXED SATELLITE (SPACE-TO-EARTH); MOBILE; MOBILE-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+10.8 dB",
   "reason":"PFD -108.1 dB(W\/m2) in 1 MHz at 11.1 deg elevation exceeds RR Table 21-4 limit -118.9 by 10.8 dB (worst case per Traficom guidance: peak gain 57.0 dBi toward Finland); 1138 combination(s) in rows 10700_11700_FSS_GSO, 13400_13650_FSS_GSO_R1, 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 21400_22000_FSS_BSS_EESS_ISS_SR, 25250_27500_FSS_BSS_EESS_ISS_SR, 3400_4200_FSS_GSO, 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 40500_42000_FSS_BSS_GSO, 42000_42500_FSS_BSS_GSO, 7250_7900_FSS_METSAT_MSS_SR"
@@ -324,7 +324,7 @@
   "br_finding":"A- x3",
   "finnish_station_id":"800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800300(RX);800311(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800303(TX);800314(TX)",
   "m4_service":"FIXED",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+9.4 dB; Finnish stations in band",
   "reason":"PFD -134.6 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 9.4 dB (worst case per Traficom guidance: peak gain 6.0 dBi toward Finland); 4 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR"
@@ -357,7 +357,7 @@
   "br_finding":"",
   "finnish_station_id":"800000(RX);800001(RX);800002(RX);800003(RX);800060(RX);800061(RX);800062(RX);800063(RX);800120(RX);800121(RX);800122(RX);800123(RX);800180(RX);800181(RX);800182(RX);800183(RX);800240(RX);800241(RX);800242(RX);800243(RX);800300(RX);800311(RX);800030(TX);800031(TX);800032(TX);800033(TX);800090(TX);800091(TX);800092(TX);800093(TX);800150(TX);800151(TX);800152(TX);800153(TX);800210(TX);800211(TX);800212(TX);800213(TX);800270(TX);800271(TX);800272(TX);800273(TX);800303(TX)",
   "m4_service":"FIXED",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+6.4 dB; Finnish stations in band",
   "reason":"PFD -147.6 dB(W\/m2) in 4 kHz at 5.0 deg elevation exceeds RR Table 21-4 limit -154.0 by 6.4 dB (worst case per Traficom guidance: peak gain 0.0 dBi toward Finland); 24 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT"
@@ -390,7 +390,7 @@
   "br_finding":"",
   "finnish_station_id":"800025(RX);800026(RX);800027(RX);800028(RX);800029(RX);800085(RX);800086(RX);800087(RX);800088(RX);800089(RX);800145(RX);800146(RX);800147(RX);800148(RX);800149(RX);800205(RX);800206(RX);800207(RX);800208(RX);800209(RX);800265(RX);800266(RX);800267(RX);800268(RX);800269(RX);800308(RX);800319(RX);800055(TX);800056(TX);800057(TX);800058(TX);800059(TX);800115(TX);800116(TX);800117(TX);800118(TX);800119(TX);800175(TX);800176(TX);800177(TX);800178(TX);800179(TX);800235(TX);800236(TX);800237(TX);800238(TX);800239(TX);800295(TX);800296(TX);800297(TX);800298(TX);800299(TX);800305(TX);800316(TX)",
   "m4_service":"FIXED",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+5.6 dB; Finnish stations in band",
   "reason":"PFD -138.4 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 5.6 dB (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 2 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT"
@@ -423,7 +423,7 @@
   "br_finding":"",
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+5.3 dB; Finnish stations in band",
   "reason":"PFD -134.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -140.0 by 5.3 dB (worst case per Traficom guidance: peak gain 23.0 dBi toward Finland); 8 combination(s) in rows 8025_8500_EESS_SR"
@@ -456,7 +456,7 @@
   "br_finding":"N- x8, A- x1 (X\/21.16, X\/22.5)",
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+4.8 dB; ITU BR finding X\/21.16; Finnish stations in band",
   "reason":"PFD -135.2 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -140.0 by 4.8 dB (worst case per Traficom guidance: peak gain 17.0 dBi toward Finland); 3 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR"
@@ -489,7 +489,7 @@
   "br_finding":"A- x22",
   "finnish_station_id":"616722(RX);600529(TX)",
   "m4_service":"FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH); FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+3.8 dB; Finnish stations in band",
   "reason":"PFD -108.2 dB(W\/m2) in 1 MHz at 11.0 deg elevation exceeds RR Table 21-4 limit -112.0 by 3.8 dB (worst case per Traficom guidance: peak gain 38.0 dBi toward Finland); 288 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR"
@@ -522,7 +522,7 @@
   "br_finding":"",
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"High",
   "priority_reason":"+3.2 dB; Finnish stations in band",
   "reason":"PFD -136.8 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -140.0 by 3.2 dB (worst case per Traficom guidance: peak gain 16.5 dBi toward Finland); 1 combination(s) in rows 8025_8500_EESS_SR"
@@ -588,7 +588,7 @@
   "br_finding":"A- x338, N- x6 (Q\/RS761, X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+4.6 dB",
   "reason":"PFD -152.2 dB(W\/m2) in 4 kHz at 5.5 deg elevation exceeds RR Table 21-4 limit -156.8 by 4.6 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 320 combination(s) in rows 13400_13650_FSS_GSO_R1, 3400_4200_FSS_GSO, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -621,7 +621,7 @@
   "br_finding":"A- x400, N- x6 (Q\/RS761, X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+3.9 dB",
   "reason":"PFD -152.2 dB(W\/m2) in 4 kHz at 7.2 deg elevation exceeds RR Table 21-4 limit -156.1 by 3.9 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 286 combination(s) in rows 13400_13650_FSS_GSO_R1, 3400_4200_FSS_GSO, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -654,7 +654,7 @@
   "br_finding":"A- x378, N- x6 (Q\/RS761, X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+3.7 dB",
   "reason":"PFD -152.2 dB(W\/m2) in 4 kHz at 7.7 deg elevation exceeds RR Table 21-4 limit -155.9 by 3.7 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 306 combination(s) in rows 13400_13650_FSS_GSO_R1, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -687,7 +687,7 @@
   "br_finding":"A- x407, N- x6 (X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+3.2 dB",
   "reason":"PFD -152.2 dB(W\/m2) in 4 kHz at 9.1 deg elevation exceeds RR Table 21-4 limit -155.4 by 3.2 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 302 combination(s) in rows 13400_13650_FSS_GSO_R1, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -720,7 +720,7 @@
   "br_finding":"A- x11",
   "finnish_station_id":"603413(RX);607797(RX);611959(RX);616722(RX);628219(RX);628728(RX);632251(RX);632476(RX);636208(RX);637357(RX);643173(RX);647668(RX);600529(TX);601452(TX);602266(TX);602436(TX);605729(TX);613999(TX);614038(TX);616738(TX);623938(TX);624714(TX);631021(TX);634993(TX)",
   "m4_service":"FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH); FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+2.9 dB; Finnish stations in band",
   "reason":"PFD -111.9 dB(W\/m2) in 1 MHz at 5.5 deg elevation exceeds RR Table 21-4 limit -114.7 by 2.9 dB (worst case per Traficom guidance: peak gain 43.5 dBi toward Finland); 36 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR"
@@ -753,7 +753,7 @@
   "br_finding":"A- x108",
   "finnish_station_id":"603413(RX);607797(RX);616722(RX);628219(RX);628728(RX);632251(RX);632476(RX);637357(RX);643173(RX);647668(RX);600529(TX);601452(TX);602266(TX);605729(TX);613999(TX);614038(TX);616738(TX);623938(TX);631021(TX);634993(TX)",
   "m4_service":"FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH); FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+1.7 dB; Finnish stations in band",
   "reason":"PFD -113.3 dB(W\/m2) in 1 MHz at 5.0 deg elevation exceeds RR Table 21-4 limit -115.0 by 1.7 dB (worst case per Traficom guidance: peak gain 43.0 dBi toward Finland); 197 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, AP5_2160_2200_MSS_GSO"
@@ -786,7 +786,7 @@
   "br_finding":"",
   "finnish_station_id":"408577(RX);440557(RX);452076(RX);454152(RX);467765(RX);477781(RX);477915(RX);480622(RX);800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800005(RX);800006(RX);800007(RX);800008(RX);800009(RX);800010(RX);800011(RX);800012(RX);800013(RX);800014(RX);800015(RX);800016(RX);800017(RX);800018(RX);800019(RX);800020(RX);800021(RX);800022(RX);800023(RX);800024(RX);800025(RX);800026(RX);800027(RX);800028(RX);800029(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800065(RX);800066(RX);800067(RX);800068(RX);800069(RX);800070(RX);800071(RX);800072(RX);800073(RX);800074(RX);800075(RX);800076(RX);800077(RX);800078(RX);800079(RX);800080(RX);800081(RX);800082(RX);800083(RX);800084(RX);800085(RX);800086(RX);800087(RX);800088(RX);800089(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800125(RX);800126(RX);800127(RX);800128(RX);800129(RX);800130(RX);800131(RX);800132(RX);800133(RX);800134(RX);800135(RX);800136(RX);800137(RX);800138(RX);800139(RX);800140(RX);800141(RX);800142(RX);800143(RX);800144(RX);800145(RX);800146(RX);800147(RX);800148(RX);800149(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800185(RX);800186(RX);800187(RX);800188(RX);800189(RX);800190(RX);800191(RX);800192(RX);800193(RX);800194(RX);800195(RX);800196(RX);800197(RX);800198(RX);800199(RX);800200(RX);800201(RX);800202(RX);800203(RX);800204(RX);800205(RX);800206(RX);800207(RX);800208(RX);800209(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800245(RX);800246(RX);800247(RX);800248(RX);800249(RX);800250(RX);800251(RX);800252(RX);800253(RX);800254(RX);800255(RX);800256(RX);800257(RX);800258(RX);800259(RX);800260(RX);800261(RX);800262(RX);800263(RX);800264(RX);800265(RX);800266(RX);800267(RX);800268(RX);800269(RX);800300(RX);800301(RX);800302(RX);800306(RX);800307(RX);800308(RX);800311(RX);800312(RX);800313(RX);800317(RX);800318(RX);800319(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800035(TX);800036(TX);800037(TX);800038(TX);800039(TX);800040(TX);800041(TX);800042(TX);800043(TX);800044(TX);800045(TX);800046(TX);800047(TX);800048(TX);800049(TX);800050(TX);800051(TX);800052(TX);800053(TX);800054(TX);800055(TX);800056(TX);800057(TX);800058(TX);800059(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800095(TX);800096(TX);800097(TX);800098(TX);800099(TX);800100(TX);800101(TX);800102(TX);800103(TX);800104(TX);800105(TX);800106(TX);800107(TX);800108(TX);800109(TX);800110(TX);800111(TX);800112(TX);800113(TX);800114(TX);800115(TX);800116(TX);800117(TX);800118(TX);800119(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800155(TX);800156(TX);800157(TX);800158(TX);800159(TX);800160(TX);800161(TX);800162(TX);800163(TX);800164(TX);800165(TX);800166(TX);800167(TX);800168(TX);800169(TX);800170(TX);800171(TX);800172(TX);800173(TX);800174(TX);800175(TX);800176(TX);800177(TX);800178(TX);800179(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800215(TX);800216(TX);800217(TX);800218(TX);800219(TX);800220(TX);800221(TX);800222(TX);800223(TX);800224(TX);800225(TX);800226(TX);800227(TX);800228(TX);800229(TX);800230(TX);800231(TX);800232(TX);800233(TX);800234(TX);800235(TX);800236(TX);800237(TX);800238(TX);800239(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800275(TX);800276(TX);800277(TX);800278(TX);800279(TX);800280(TX);800281(TX);800282(TX);800283(TX);800284(TX);800285(TX);800286(TX);800287(TX);800288(TX);800289(TX);800290(TX);800291(TX);800292(TX);800293(TX);800294(TX);800295(TX);800296(TX);800297(TX);800298(TX);800299(TX);800303(TX);800304(TX);800305(TX);800309(TX);800310(TX);800314(TX);800315(TX);800316(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+0.3 dB; Finnish stations in band",
   "reason":"PFD -143.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 0.3 dB (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT"
@@ -819,7 +819,7 @@
   "br_finding":"",
   "finnish_station_id":"408577(RX);440557(RX);452076(RX);454152(RX);467765(RX);477781(RX);477915(RX);480622(RX);800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800005(RX);800006(RX);800007(RX);800008(RX);800009(RX);800010(RX);800011(RX);800012(RX);800013(RX);800014(RX);800015(RX);800016(RX);800017(RX);800018(RX);800019(RX);800020(RX);800021(RX);800022(RX);800023(RX);800024(RX);800025(RX);800026(RX);800027(RX);800028(RX);800029(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800065(RX);800066(RX);800067(RX);800068(RX);800069(RX);800070(RX);800071(RX);800072(RX);800073(RX);800074(RX);800075(RX);800076(RX);800077(RX);800078(RX);800079(RX);800080(RX);800081(RX);800082(RX);800083(RX);800084(RX);800085(RX);800086(RX);800087(RX);800088(RX);800089(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800125(RX);800126(RX);800127(RX);800128(RX);800129(RX);800130(RX);800131(RX);800132(RX);800133(RX);800134(RX);800135(RX);800136(RX);800137(RX);800138(RX);800139(RX);800140(RX);800141(RX);800142(RX);800143(RX);800144(RX);800145(RX);800146(RX);800147(RX);800148(RX);800149(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800185(RX);800186(RX);800187(RX);800188(RX);800189(RX);800190(RX);800191(RX);800192(RX);800193(RX);800194(RX);800195(RX);800196(RX);800197(RX);800198(RX);800199(RX);800200(RX);800201(RX);800202(RX);800203(RX);800204(RX);800205(RX);800206(RX);800207(RX);800208(RX);800209(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800245(RX);800246(RX);800247(RX);800248(RX);800249(RX);800250(RX);800251(RX);800252(RX);800253(RX);800254(RX);800255(RX);800256(RX);800257(RX);800258(RX);800259(RX);800260(RX);800261(RX);800262(RX);800263(RX);800264(RX);800265(RX);800266(RX);800267(RX);800268(RX);800269(RX);800300(RX);800301(RX);800302(RX);800306(RX);800307(RX);800308(RX);800311(RX);800312(RX);800313(RX);800317(RX);800318(RX);800319(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800035(TX);800036(TX);800037(TX);800038(TX);800039(TX);800040(TX);800041(TX);800042(TX);800043(TX);800044(TX);800045(TX);800046(TX);800047(TX);800048(TX);800049(TX);800050(TX);800051(TX);800052(TX);800053(TX);800054(TX);800055(TX);800056(TX);800057(TX);800058(TX);800059(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800095(TX);800096(TX);800097(TX);800098(TX);800099(TX);800100(TX);800101(TX);800102(TX);800103(TX);800104(TX);800105(TX);800106(TX);800107(TX);800108(TX);800109(TX);800110(TX);800111(TX);800112(TX);800113(TX);800114(TX);800115(TX);800116(TX);800117(TX);800118(TX);800119(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800155(TX);800156(TX);800157(TX);800158(TX);800159(TX);800160(TX);800161(TX);800162(TX);800163(TX);800164(TX);800165(TX);800166(TX);800167(TX);800168(TX);800169(TX);800170(TX);800171(TX);800172(TX);800173(TX);800174(TX);800175(TX);800176(TX);800177(TX);800178(TX);800179(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800215(TX);800216(TX);800217(TX);800218(TX);800219(TX);800220(TX);800221(TX);800222(TX);800223(TX);800224(TX);800225(TX);800226(TX);800227(TX);800228(TX);800229(TX);800230(TX);800231(TX);800232(TX);800233(TX);800234(TX);800235(TX);800236(TX);800237(TX);800238(TX);800239(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800275(TX);800276(TX);800277(TX);800278(TX);800279(TX);800280(TX);800281(TX);800282(TX);800283(TX);800284(TX);800285(TX);800286(TX);800287(TX);800288(TX);800289(TX);800290(TX);800291(TX);800292(TX);800293(TX);800294(TX);800295(TX);800296(TX);800297(TX);800298(TX);800299(TX);800303(TX);800304(TX);800305(TX);800309(TX);800310(TX);800314(TX);800315(TX);800316(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+0.3 dB; Finnish stations in band",
   "reason":"PFD -143.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 0.3 dB (worst case per Traficom guidance: peak gain 7.5 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT"
@@ -852,7 +852,7 @@
   "br_finding":"A- x18",
   "finnish_station_id":"603413(RX);628219(RX);628728(RX);637357(RX);601452(TX);605729(TX);631021(TX);634993(TX)",
   "m4_service":"FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Medium",
   "priority_reason":"+0.1 dB; Finnish stations in band",
   "reason":"PFD -114.9 dB(W\/m2) in 1 MHz at 4.2 deg elevation exceeds RR Table 21-4 limit -115.0 by 0.1 dB (worst case per Traficom guidance: peak gain 36.6 dBi toward Finland); 844 combination(s) in rows 17700_19300_FSS_ISS_METSAT"
@@ -885,7 +885,7 @@
   "br_finding":"A- x387, N- x6 (Q\/RS761, X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+2.7 dB",
   "reason":"PFD -152.1 dB(W\/m2) in 4 kHz at 10.5 deg elevation exceeds RR Table 21-4 limit -154.8 by 2.7 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 314 combination(s) in rows 13400_13650_FSS_GSO_R1, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -918,7 +918,7 @@
   "br_finding":"A- x406, N- x6 (Q\/RS761, X\/11.31)",
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+2.5 dB",
   "reason":"PFD -152.1 dB(W\/m2) in 4 kHz at 10.8 deg elevation exceeds RR Table 21-4 limit -154.7 by 2.6 dB (worst case per Traficom guidance: peak gain 35.0 dBi toward Finland); 286 combination(s) in rows 13400_13650_FSS_GSO_R1, AP5_1518_1530_MSS, AP5_2160_2200_MSS_GSO, AP5_2483.5_2500_MSS_GSO"
@@ -951,7 +951,7 @@
   "br_finding":"A- x39",
   "finnish_station_id":"",
   "m4_service":"FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+1.9 dB",
   "reason":"PFD -147.2 dB(W\/m2) in 4 kHz at 6.7 deg elevation exceeds RR Table 21-4 limit -149.1 by 1.9 dB (worst case per Traficom guidance: peak gain 36.0 dBi toward Finland); 620 combination(s) in rows 10700_11700_FSS_GSO"
@@ -984,7 +984,7 @@
   "br_finding":"A- x194",
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+1.6 dB",
   "reason":"PFD -121.5 dB(W\/m2) in 1 MHz at 7.9 deg elevation exceeds RR Table 21-4 limit -123.1 by 1.6 dB (worst case per Traficom guidance: peak gain 50.0 dBi toward Finland); 797 combination(s) in rows 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 42000_42500_FSS_BSS_GSO"
@@ -1017,7 +1017,7 @@
   "br_finding":"A- x190",
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+1.5 dB",
   "reason":"PFD -121.5 dB(W\/m2) in 1 MHz at 8.0 deg elevation exceeds RR Table 21-4 limit -123.0 by 1.5 dB (worst case per Traficom guidance: peak gain 50.0 dBi toward Finland); 1594 combination(s) in rows 37500_40000_FSS_MSS_GSO, 40000_40500_FSS_MSS, 42000_42500_FSS_BSS_GSO"
@@ -1050,7 +1050,7 @@
   "br_finding":"A- x14",
   "finnish_station_id":"",
   "m4_service":"METEOROLOGICAL-SATELLITE (SPACE-TO-EARTH)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+0.6 dB",
   "reason":"PFD -132.4 dB(W\/m2) in 1.5 MHz at 90.0 deg elevation exceeds RR Table 21-4 limit -133.0 by 0.6 dB (worst case per Traficom guidance: peak gain 7.0 dBi toward Finland); 8 combination(s) in rows 1670_1700_EESS_METSAT, 2200_2300_SO_SR_EESS_METSAT"
@@ -1083,7 +1083,7 @@
   "br_finding":"",
   "finnish_station_id":"",
   "m4_service":"Amateur; MOBILE AND FIXED",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+0.0 dB",
   "reason":"PFD -152.0 dB(W\/m2) in 4 kHz at 4.9 deg elevation exceeds RR Table 21-4 limit -152.0 by 0.0 dB (worst case per Traficom guidance: peak gain 19.0 dBi toward Finland); 1632 combination(s) in rows 3400_4200_FSS_GSO, 7250_7900_FSS_METSAT_MSS_SR"
@@ -1116,7 +1116,7 @@
   "br_finding":"",
   "finnish_station_id":"",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
-  "result_class":"CRITICAL ERROR",
+  "result_class":"EXCEEDS LIMIT",
   "priority":"Low",
   "priority_reason":"+0.0 dB",
   "reason":"PFD -144.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation exceeds RR Table 21-4 limit -144.0 by 0.0 dB (worst case per Traficom guidance: peak gain 0.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT"

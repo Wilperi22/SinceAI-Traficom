@@ -431,7 +431,7 @@ const sgn = (v, d=1) => (v === null || v === undefined || isNaN(v)) ? "" : (v >=
 const admName = c => D.adm[c] ? `${D.adm[c]} (${c})` : c;
 
 const CLASS = {
-  "CRITICAL ERROR": ["var(--critical)", "Exceeds limit"],
+  "EXCEEDS LIMIT": ["var(--critical)", "Exceeds limit"],
   "COORDINATION REQUIRED": ["var(--serious)", "Coordination required"],
   "SUB_QA_EXCEEDANCE": ["var(--warning)", "Small exceedance"],
   "LIMIT_NOT_APPLICABLE": ["var(--warning)", "Limit not applicable (>99 sats)"],
@@ -476,7 +476,7 @@ $$("nav button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 // ---------- overview ----------
 const count = (rows, c) => rows.filter(r => r.result_class === c).length;
 const tiles = [
-  {k:`Space ${D.spaceIfic} alerts`, v:D.space.alerts.length, d:`${D.space.alerts.filter(r => r.priority === "High").length} high priority · ${count(D.space.alerts,"CRITICAL ERROR")} exceed Table 21-4 · ${count(D.space.alerts,"COORDINATION REQUIRED")} need coordination (RR 9.14)`, go:["space","alerts"]},
+  {k:`Space ${D.spaceIfic} alerts`, v:D.space.alerts.length, d:`${D.space.alerts.filter(r => r.priority === "High").length} high priority · ${count(D.space.alerts,"EXCEEDS LIMIT")} exceed Table 21-4 · ${count(D.space.alerts,"COORDINATION REQUIRED")} need coordination (RR 9.14)`, go:["space","alerts"]},
   {k:`Space ${D.spaceIfic} concerns`, v:D.space.concerns.length, d:"near limit, limit not applicable, worst-case", go:["space","concerns"]},
   {k:`Terrestrial ${D.terraIfic} alerts`, v:D.terra.alerts.length, d:`${D.terra.alerts.filter(r => r.priority === "High").length} high priority · exceed T/R 25-08 trigger at the Finnish border`, go:["terra","alerts"]},
   {k:`Terrestrial ${D.terraIfic} concerns`, v:D.terra.concerns.length, d:"within the near-limit margin", go:["terra","concerns"]},
@@ -523,6 +523,7 @@ const COLS = {
     ["Class", r => r.station_class], ["Change", r => r.change_type], ["Freq (MHz)", r => r.frequency_mhz, "num"],
     ["Distance (km)", r => r.distance_km, "num"], ["Field (dBµV/m)", r => r.field_strength_dbuv_m, "num1"], ["Result", r => r.result_class, "badge"],
     ["Margin (dB)", r => r.margin_db, "margin"], ["Coordinated w/ FIN", r => r.coordination_with_fin ? "recorded" : ""],
+    ["vs earlier issues", r => r.change_vs_previous_issues || ""],
   ],
 };
 const STATE = {space:{mode:"alerts", sort:null, dir:1}, terra:{mode:"alerts", sort:null, dir:1}};
@@ -606,6 +607,8 @@ function openDetail(k, r){
         ["Site", `${esc(r.site_name)}, ${num(r.latitude,4)} N ${num(r.longitude,4)} E (${esc(r.geo_type)}${r.radius_km ? `, radius ${num(r.radius_km,0)} km` : ""})`],
         ["Frequency / bandwidth", `${esc(r.frequency_mhz)} MHz / ${esc(r.bandwidth_khz)} kHz, ${esc(r.emission)}`],
         ["e.r.p. / antenna height", `${num(r.erp_dbw)} dBW / ${num(r.tx_height_m,0)} m`], ["ITU remarks", esc(r.itu_remarks)]])}
+      <h3>Compared with earlier IFIC issues</h3>${kv([["Status", esc(r.change_vs_previous_issues || "-")],
+        ["Earlier publications", esc(r.issue_history) || "<span class=\"note\">none in the processed issues</span>"]])}
       <h3>Affected in Finland</h3>${kv([["M4 services at this frequency", esc(r.m4_service) || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
       <h3>Recommended letter</h3>${letterBlock("T:" + r.notice_id, `T_${r.country}_${r.notice_id}`)}`;
   }

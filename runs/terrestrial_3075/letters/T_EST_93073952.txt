@@ -1,0 +1,41 @@
+DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
+
+From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
+To:   Administration of Estonia (Republic of) (EST)
+Date: 2026-11-07
+Subject: BR IFIC (Terrestrial Services) No. 3075 - land-mobile assignment 93073952
+         (IRU, 152.05 MHz): field strength at the Finnish border
+
+Dear colleagues,
+
+The Administration of Finland has examined the new land-mobile assignment
+93073952 (station class FB) published in BR IFIC (Terrestrial Services)
+No. 3075. Our calculation indicates that the field strength produced on Finnish territory
+exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).
+
+Technical summary
+  Assignment:                 93073952 (adm. ref. EE160FBHAR008), 152.05 MHz, 16.0 kHz, F3E--
+  Transmitter site:           IRU, 59.4519 N 24.9258 E
+  e.r.p. / antenna height:    16.0 dBW / 200 m
+  Worst point in Finland:     territorial sea, 59.8700 N 24.7700 E (47.3 km)
+  Path:                       Land 8.1 km + Cold 39.3 km
+  Model:                      ITU-R P.1546-6 (Py1546), 10% time, 50% locations, h2=10 m, Rural, no terrain
+  Calculated field strength:  39.8 dB(uV/m)
+  T/R 25-08 trigger:          20.0 dB(uV/m)
+  Exceedance:                 19.8 dB
+  Finnish stations affected:  none in the special-interest list above the trigger
+
+The ITU records list the following coordination status with Finland for this assignment:
+  COORD COMPLETED (RR6.7, 2026-05-25)
+Finland will verify this status against its national frequency register.
+
+In view of the above, the Administration of Finland kindly requests that you
+  1. confirm the technical characteristics of the assignment, and
+  2. coordinate the assignment with the Administration of Finland before bringing it into use,
+     or reduce the field strength at the border below the T/R 25-08 trigger.
+
+The Administration of Finland reserves its rights with respect to protection of its
+radiocommunication services from harmful interference.
+
+Yours faithfully,
+Traficom - Spectrum and Space

@@ -127,7 +127,7 @@ OUTPUT_COLUMNS = [
     "longitude", "geo_type", "radius_km", "frequency_mhz", "bandwidth_khz", "emission", "erp_dbw",
     "tx_height_m", "worst_point_lat", "worst_point_lon", "worst_point_type", "distance_km", "path",
     "model", "field_strength_dbuv_m", "threshold_dbuv_m", "margin_db", "finnish_station_id",
-    "m4_service", "coordination_with_fin", "itu_remarks", "result_class", "priority", "priority_reason", "reason",
+    "m4_service", "coordination_with_fin", "itu_remarks", "change_vs_previous_issues", "issue_history", "result_class", "priority", "priority_reason", "reason",
 ]
 
 
@@ -200,7 +200,12 @@ def field_strength_1kw(f_mhz: float, h1: float, lengths: list[float], zones: lis
     if P1546 is None:
         return 106.9 - 20 * np.log10(d)
     with contextlib.redirect_stdout(io.StringIO()):  # Py1546 prints h1 warnings for 3-15 km paths
-        E, _ = P1546.bt_loss(float(f_mhz), TIME_PERCENT, float(max(h1, 1.0)), RX_HEIGHT_M, 10.0, "Rural",
+        h = float(max(h1, 1.0))
+        if all(z != "Land" for z in zones):
+            # P.1546 §3.3: sea paths are unreliable below h1 = 3 m. Py1546 6.1 intends h1 = 3 m here but
+            # returns None (bare 'return' in h1_calc) and crashes - first seen on Terrestrial IFIC 3075.
+            h = max(h, 3.0)
+        E, _ = P1546.bt_loss(float(f_mhz), TIME_PERCENT, h, RX_HEIGHT_M, 10.0, "Rural",
                              [max(x, 0.001) for x in lengths], zones, 0)
     return float(E)
 
@@ -220,7 +225,9 @@ def erp_dbw(ant: pd.DataFrame) -> pd.Series:
 def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame, ific_number: int,
                        min_exceedance_db: float = MIN_EXCEEDANCE_MARGIN_DB,
                        near_limit_db: float = NEAR_LIMIT_DB, border: dict | None = None,
-                       audit: list[str] | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+                       audit: list[str] | None = None,
+                       previous: dict[int, Path] | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """previous: {ific: sqlite path} of earlier Terrestrial IFICs, for the cross-issue history."""
     audit = audit if audit is not None else []
     note = audit.append
     with open_db(database) as connection:
@@ -283,6 +290,12 @@ def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame,
 
     results = [evaluate(r, border, stations) for r in rows.itertuples(index=False)]
     rows = pd.concat([rows.reset_index(drop=True), pd.DataFrame(results)], axis=1)
+    history = issue_history(rows, previous or {}, ific_number)
+    rows["issue_history"] = history["issue_history"].to_numpy()
+    rows["change_vs_previous_issues"] = history["change"].to_numpy()
+    if previous:
+        note(f"Compared with earlier Terrestrial IFICs {sorted(previous)}: "
+             + ", ".join(f"{c}: {n}" for c, n in rows["change_vs_previous_issues"].value_counts().items()))
     rows["threshold_dbuv_m"] = TRIGGER_DBUV_M + 10 * np.log10(np.maximum(rows["bdwdth"].fillna(25.0), TRIGGER_REF_BW_KHZ)
                                                               / TRIGGER_REF_BW_KHZ)
     rows["margin_db"] = rows["field_strength_dbuv_m"] - rows["threshold_dbuv_m"]
@@ -294,12 +307,12 @@ def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame,
         cls = np.where(m >= 0, "REVIEW:P1546_UNAVAILABLE", "")
     else:
         cls = np.select([m >= min_exceedance_db, (m >= 0), (m >= -near_limit_db)],
-                        ["CRITICAL ERROR", "SUB_QA_EXCEEDANCE", "NEAR_LIMIT"], default="")
+                        ["EXCEEDS LIMIT", "SUB_QA_EXCEEDANCE", "NEAR_LIMIT"], default="")
     rows["result_class"] = cls
     rows["reason"] = [reason(r, min_exceedance_db, near_limit_db) for r in rows.itertuples()]
 
     out = format_rows(rows, m4)
-    alerts = prioritise_terrestrial(out[out["result_class"] == "CRITICAL ERROR"])
+    alerts = prioritise_terrestrial(out[out["result_class"] == "EXCEEDS LIMIT"])
     concerns = out[out["result_class"].isin(["SUB_QA_EXCEEDANCE", "NEAR_LIMIT", "REVIEW:P1546_UNAVAILABLE"])]
     concerns = concerns.sort_values(["result_class", "margin_db"], ascending=[True, False])
     note(f"Alerts (margin >= {min_exceedance_db:g} dB): {len(alerts)}; concerns: {len(concerns)} "
@@ -364,7 +377,7 @@ def reason(r, min_db: float, near_db: float) -> str:
 def _reason(r, min_db: float, near_db: float) -> str:
     base = (f"{r.field_strength_dbuv_m:.1f} dB(uV/m) at {r.worst_point_type} ({r.distance_km:.0f} km, "
             f"{r.path}) vs T/R 25-08 A1.2.3 trigger {r.threshold_dbuv_m:.1f} dB(uV/m)")
-    if r.result_class == "CRITICAL ERROR":
+    if r.result_class == "EXCEEDS LIMIT":
         return f"{base}: exceeded by {r.margin_db:.1f} dB"
     if r.result_class == "SUB_QA_EXCEEDANCE":
         return f"{base}: exceeded by {r.margin_db:.1f} dB, below the {min_db:g} dB QA gate"
@@ -373,6 +386,49 @@ def _reason(r, min_db: float, near_db: float) -> str:
     if r.result_class.startswith("REVIEW"):
         return f"{base}: free-space upper bound only, P.1546 implementation not installed"
     return base
+
+
+HISTORY_SQL = f"""
+SELECT t.adm, t.adm_ref_id, t.stn_cls, t.freq_assgn, t.intent, g.lat_dec, g.long_dec
+FROM fxm_terra t
+LEFT JOIN fxm_tx x ON x.terrakey = t.terrakey
+LEFT JOIN fxm_geo g ON g.geo_key = COALESCE(x.geo_key, t.geo_key)
+WHERE t.stn_cls IN ({",".join(f"'{c}'" for c in LAND_MOBILE_CLASSES)}) AND t.adm_ref_id IS NOT NULL AND t.adm_ref_id != ''
+"""
+
+
+def issue_history(rows: pd.DataFrame, previous: dict[int, Path], ific: int) -> pd.DataFrame:
+    """Consecutive-issue comparison (brief: identify what is new, modified or withdrawn).
+
+    An assignment is identified by administration + administration reference + station class.
+    Same frequency and site in an earlier issue -> REPUBLISHED; same identity with another
+    frequency or site -> MODIFIED; otherwise NEW (first seen in the processed series).
+    """
+    out = pd.DataFrame({"issue_history": [""] * len(rows), "change": ["NEW"] * len(rows)}, index=rows.index)
+    earlier = []
+    for number, path in sorted(previous.items()):
+        if number >= ific:
+            continue
+        with open_db(path) as con:
+            frame = pd.read_sql_query(HISTORY_SQL, con)
+        frame["ific"] = number
+        earlier.append(frame)
+    if not earlier:
+        out["change"] = "NO EARLIER ISSUE PROCESSED"
+        return out
+    earlier = pd.concat(earlier, ignore_index=True)
+    groups = {key: g for key, g in earlier.groupby(["adm", "adm_ref_id", "stn_cls"])}
+    for i, r in rows.iterrows():
+        g = groups.get((r["adm"], r["adm_ref_id"], r["stn_cls"]))
+        if g is None or pd.isna(r["adm_ref_id"]) or not r["adm_ref_id"]:
+            continue
+        same = g[(g["freq_assgn"].sub(r["freq_assgn"]).abs() < 1e-6)
+                 & (g["lat_dec"].sub(r["lat_dec"]).abs().fillna(1) < 1e-3)
+                 & (g["long_dec"].sub(r["long_dec"]).abs().fillna(1) < 1e-3)]
+        out.at[i, "change"] = "REPUBLISHED" if len(same) else "MODIFIED"
+        out.at[i, "issue_history"] = "; ".join(
+            f"{int(h.ific)}: {h.intent} {h.freq_assgn:g} MHz" for h in g.sort_values("ific").itertuples())
+    return out
 
 
 def format_rows(rows: pd.DataFrame, m4: pd.DataFrame) -> pd.DataFrame:
@@ -391,6 +447,7 @@ def format_rows(rows: pd.DataFrame, m4: pd.DataFrame) -> pd.DataFrame:
         "threshold_dbuv_m": rows["threshold_dbuv_m"].round(2), "margin_db": rows["margin_db"].round(2),
         "finnish_station_id": rows["finnish_station_id"],
         "coordination_with_fin": rows["coordination_with_fin"].fillna(""),
+        "change_vs_previous_issues": rows["change_vs_previous_issues"], "issue_history": rows["issue_history"],
         "itu_remarks": rows["itu_remarks"].fillna(""), "result_class": rows["result_class"],
         "reason": rows["reason"],
     })
