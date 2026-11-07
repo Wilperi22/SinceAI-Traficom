@@ -149,7 +149,7 @@ with tab2:
         "874 stations with coordinates, technical parameters, and transmission details."
     )
 
-    # Sidebar filters for the map
+    # Map filters (only shown when on this tab)
     with st.sidebar:
         st.header("🗺️ Map Filters")
 
@@ -189,6 +189,9 @@ with tab2:
             step=1.0,
             key="map_power_range",
         )
+
+        # Map options
+        use_clustering = st.checkbox("Cluster Markers", value=True, key="map_cluster")
 
     # Apply filters
     filtered_df = stations_df.copy()
@@ -238,21 +241,17 @@ with tab2:
 
     st.metric("Stations Displayed", len(filtered_df))
 
-    # Map options
-    col_map1, col_map2 = st.columns([3, 1])
-    with col_map2:
-        base_map = st.selectbox(
-            "Base Map",
-            ["OpenStreetMap", "CartoDB Positron", "CartoDB Dark_Matter", "Stamen Terrain"],
-            key="map_base",
-        )
-        use_clustering = st.checkbox("Cluster Markers", value=True, key="map_cluster")
-    with col_map1:
-        st.write("")  # spacer
-
-    # Create Folium map centered on Finland
+    # Create Folium map centered on Finland (OpenStreetMap only)
     finland_center = [64.0, 26.0]
-    m = folium.Map(location=finland_center, zoom_start=5, tiles=base_map)
+    m = folium.Map(location=finland_center, zoom_start=5, tiles="OpenStreetMap")
+
+    # Add fullscreen control
+    folium.plugins.Fullscreen(
+        position="topright",
+        title="Full Screen",
+        title_cancel="Exit Full Screen",
+        force_separate_button=True,
+    ).add_to(m)
 
     # Color mapping for polarisation
     pol_colors = {
@@ -319,10 +318,10 @@ with tab2:
             tooltip=f"Station {int(row['station_number'])} | {row['polarisation']} | {row['tx_frequency']}",
         ).add_to(target)
 
-    # Add legend
+    # Add legend (dark theme)
     legend_html = """
-    <div style="position: fixed; bottom: 50px; left: 50px; z-index: 1000; background-color: white;
-                padding: 10px; border: 2px solid grey; border-radius: 5px; font-size: 12px;">
+    <div style="position: fixed; bottom: 50px; left: 50px; z-index: 1000; background-color: #1e1e1e;
+                padding: 10px; border: 2px solid #444; border-radius: 5px; font-size: 12px; color: #eee;">
     <b>Polarisation</b><br>
     """
     for pol, col in pol_colors.items():
