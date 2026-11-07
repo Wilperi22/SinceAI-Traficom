@@ -11,8 +11,13 @@ verbatim, otherwise the template draft is used.
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import re
 import sys
+import textwrap
+import urllib.error
+import urllib.request
 from datetime import date
 from pathlib import Path
 
@@ -102,6 +107,11 @@ ADMINISTRATIONS = {
 }
 
 MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-5")   # override with --model or ANTHROPIC_MODEL
+LOCAL_MODEL = os.environ.get("LETTER_AI_MODEL", "llama3.2:3b")  # local model served by Ollama
+OLLAMA_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
+AI_NOTE = ("Note: the opening paragraph was drafted by a local language model ({model}) from the calculated "
+           "figures and\nchecked automatically; every number in it matches the technical summary below.")
 
 
 def key_figures(f: pd.Series) -> list[str]:
@@ -109,7 +119,7 @@ def key_figures(f: pd.Series) -> list[str]:
             f"{f['margin_of_exceedance']:.1f}", str(f["frequency_mhz"])]
 
 
-def template_letter(f: pd.Series, ific: int) -> str:
+def template_letter(f: pd.Series, ific: int, intro: str | None = None, ai_model: str = "") -> str:
     adm = ADMINISTRATIONS.get(f["country"], f["country"])
     related = f" (and related notice {f['related_notice_id']})" if str(f["related_notice_id"]) not in ("", "nan") else ""
     orbit = (f"geostationary orbit at {f['gso_longitude']:.1f}°" if f["orbit"] == "GSO"
@@ -127,8 +137,12 @@ def template_letter(f: pd.Series, ific: int) -> str:
                "     assignments are notified" if coord else
                "take the necessary measures (e.g. pfd masks, beam pointing restrictions) to ensure\n"
                "     compliance with RR No. 21.16 and Table 21-4, so that Finnish services are protected")
+    opening = (f"""The Administration of Finland has examined the {f['notice_type']} information for the satellite
+network {f['network_name']} published in BR IFIC (Space Services) No. {ific}. Our analysis
+indicates that the notified characteristics may produce a power flux-density (pfd) at the
+Earth's surface over Finnish territory that exceeds {basis}.""" if not intro else _wrap(intro))
     return f"""DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
-
+{chr(10) + AI_NOTE.format(model=ai_model) + chr(10) if intro else ""}
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of {adm} ({f['country']})
 Date: {date.today().isoformat()}
@@ -137,10 +151,7 @@ Subject: BR IFIC {ific} - satellite network {f['network_name']}, notice {f['noti
 
 Dear colleagues,
 
-The Administration of Finland has examined the {f['notice_type']} information for the satellite
-network {f['network_name']} published in BR IFIC (Space Services) No. {ific}. Our analysis
-indicates that the notified characteristics may produce a power flux-density (pfd) at the
-Earth's surface over Finnish territory that exceeds {basis}.
+{opening}
 
 Technical summary
   Notice / network:           {f['notice_id']} / {f['network_name']}
@@ -218,7 +229,78 @@ def polish(draft: str, figures: list[str], model: str = MODEL) -> str | None:
     return text
 
 
-def terrestrial_letter(f: pd.Series, ific: int) -> str:
+def _wrap(text: str) -> str:
+    return "\n".join(textwrap.wrap(" ".join(text.split()), width=95))
+
+
+def letter_facts(f: pd.Series, kind: str, ific: int) -> dict:
+    """The only facts the language model may use (all figures come from the calculation)."""
+    adm = ADMINISTRATIONS.get(f["country"], f["country"])
+    if kind == "space":
+        return {"recipient": f"Administration of {adm}", "ific": f"BR IFIC (Space Services) No. {ific}",
+                "network": f["network_name"], "notice": str(f["notice_id"]), "notice type": f["notice_type"],
+                "frequency band MHz": f["frequency_mhz"], "finding": f["result_class"].lower(),
+                "calculated pfd dB(W/m2)": f"{f['pfd_dbw_m2']:.1f}", "limit dB(W/m2)": f"{f['pfd_limit_dbw_m2']:.1f}",
+                "reference bandwidth": f["reference_bandwidth"], "exceedance dB": f"{f['margin_of_exceedance']:.1f}",
+                "regulation": f["rr_reference"], "affected Finnish services": f["m4_service"] or "n/a"}
+    return {"recipient": f"Administration of {adm}", "ific": f"BR IFIC (Terrestrial Services) No. {ific}",
+            "station": f["site_name"], "assignment": str(f["notice_id"]), "station class": f["station_class"],
+            "frequency MHz": f["frequency_mhz"], "calculated field strength dB(uV/m)": f"{f['field_strength_dbuv_m']:.1f}",
+            "trigger dB(uV/m)": f"{f['threshold_dbuv_m']:.1f}", "exceedance dB": f"{f['margin_db']:.1f}",
+            "distance to Finnish territory km": f"{f['distance_km']:.1f}",
+            "criterion": "CEPT Recommendation T/R 25-08, Annex 1, A1.2.3"}
+
+
+def check_paragraph(text: str, facts: dict) -> str | None:
+    """Reason to reject an AI paragraph, or None if it is acceptable: every number must come from the facts."""
+    allowed = set()
+    for value in [*facts.keys(), *facts.values()]:   # names carry units such as dB(W/m2)
+        for n in NUMBER.findall(str(value)):
+            allowed |= {n, n.replace(",", "."), n.split(".")[0]}
+    invented = sorted({n for n in NUMBER.findall(text) if n.replace(",", ".") not in allowed})
+    if invented:
+        return f"numbers not in the calculation: {invented}"
+    if not 150 <= len(text) <= 1200:
+        return f"length {len(text)} outside 150-1200 characters"
+    if any(mark in text for mark in ("[", "{", "<", "Dear", "Yours")):
+        return "contains placeholders or letter framing"
+    return None
+
+
+def ai_intro(facts: dict, model: str = LOCAL_MODEL, url: str = OLLAMA_URL) -> tuple[str | None, str]:
+    """Opening paragraph drafted by a local model via Ollama; (paragraph, status). Never raises."""
+    prompt = ("Write the opening paragraph (3-4 sentences, formal and courteous) of a letter from the "
+              "Administration of Finland to the recipient below about a frequency assignment published in the "
+              "ITU BR IFIC. Explain in plain language what was found and why it concerns Finland. Use ONLY these "
+              "facts; copy any number exactly as written and do not introduce any other number, date or claim. "
+              "Do not write a greeting, signature, list or request - only the paragraph.\n\nFacts:\n"
+              + "\n".join(f"- {k}: {v}" for k, v in facts.items()))
+    body = json.dumps({"model": model, "stream": False, "options": {"temperature": 0.2, "num_predict": 300},
+                       "messages": [{"role": "system", "content": "You draft formal correspondence between national "
+                                     "radio spectrum administrations. You never invent figures."},
+                                    {"role": "user", "content": prompt}]}).encode()
+    request = urllib.request.Request(f"{url}/api/chat", data=body, headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=300) as response:
+            text = json.load(response)["message"]["content"].strip()
+    except (OSError, ValueError, KeyError) as exc:  # server down, model missing, bad JSON
+        return None, f"local AI unavailable ({type(exc).__name__}: {exc}) - template kept"
+    reason = check_paragraph(text, facts)
+    if reason:
+        return None, f"AI paragraph rejected ({reason}) - template kept"
+    return text, f"AI paragraph accepted ({model}, figures verified)"
+
+
+def make_letter(f: pd.Series, kind: str, ific: int, ai: bool = False, model: str = LOCAL_MODEL) -> tuple[str, str]:
+    """(letter text, how it was produced)."""
+    build = template_letter if kind == "space" else terrestrial_letter
+    if not ai:
+        return build(f, ific), "template"
+    intro, status = ai_intro(letter_facts(f, kind, ific), model)
+    return build(f, ific, intro, model), status
+
+
+def terrestrial_letter(f: pd.Series, ific: int, intro: str | None = None, ai_model: str = "") -> str:
     """Draft for a foreign land-mobile assignment exceeding the T/R 25-08 trigger at the Finnish border."""
     adm = ADMINISTRATIONS.get(f["country"], f["country"])
     coord = str(f.get("coordination_with_fin", "") or "")
@@ -227,8 +309,12 @@ def terrestrial_letter(f: pd.Series, ific: int) -> str:
                   if coord and coord != "nan" else "")
     stations = str(f.get("finnish_station_id", "") or "")
     stations = stations if stations and stations != "nan" else "none in the special-interest list above the trigger"
+    opening = (f"""The Administration of Finland has examined the {str(f['change_type']).lower()} land-mobile assignment
+{f['notice_id']} (station class {f['station_class']}) published in BR IFIC (Terrestrial Services)
+No. {ific}. Our calculation indicates that the field strength produced on Finnish territory
+exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).""" if not intro else _wrap(intro))
     return f"""DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
-
+{chr(10) + AI_NOTE.format(model=ai_model) + chr(10) if intro else ""}
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of {adm} ({f['country']})
 Date: {date.today().isoformat()}
@@ -237,10 +323,7 @@ Subject: BR IFIC (Terrestrial Services) No. {ific} - land-mobile assignment {f['
 
 Dear colleagues,
 
-The Administration of Finland has examined the {str(f['change_type']).lower()} land-mobile assignment
-{f['notice_id']} (station class {f['station_class']}) published in BR IFIC (Terrestrial Services)
-No. {ific}. Our calculation indicates that the field strength produced on Finnish territory
-exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2.3).
+{opening}
 
 Technical summary
   Assignment:                 {f['notice_id']} (adm. ref. {f['adm_ref_id']}), {f['frequency_mhz']} MHz, {f['bandwidth_khz']} kHz, {f['emission']}
@@ -276,13 +359,15 @@ def main() -> None:
     parser.add_argument("--terrestrial-ific", type=int, default=3076)
     parser.add_argument("--model", default=MODEL, help="Claude model for --polish (default %(default)s)")
     parser.add_argument("--polish", action="store_true", help="Polish prose with Claude (needs credentials)")
+    parser.add_argument("--ai", action="store_true",
+                        help="Opening paragraph by a local model via Ollama (figures verified; template on failure)")
+    parser.add_argument("--ai-model", default=LOCAL_MODEL, help="Ollama model for --ai (default %(default)s)")
     args = parser.parse_args()
 
     findings = pd.read_csv(args.report, dtype={"notice_id": str, "related_notice_id": str})
     args.out_dir.mkdir(exist_ok=True)
     for _, f in findings.iterrows():
-        draft = template_letter(f, args.ific_number)
-        source = "template"
+        draft, source = make_letter(f, "space", args.ific_number, args.ai, args.ai_model)
         if args.polish:
             polished = polish(draft, key_figures(f), args.model)
             if polished:
@@ -296,7 +381,9 @@ def main() -> None:
         terra = pd.read_csv(args.terrestrial_report, dtype={"notice_id": str, "adm_ref_id": str})
         for _, f in terra.iterrows():
             path = args.out_dir / f"T_{f['country']}_{f['notice_id']}.txt"
-            path.write_text(terrestrial_letter(f, args.terrestrial_ific), encoding="utf-8")
+            text, source = make_letter(f, "terrestrial", args.terrestrial_ific, args.ai, args.ai_model)
+            path.write_text(text, encoding="utf-8")
+            print(f"{path}  [{source}]")
         print(f"{len(terra)} terrestrial draft letters in {args.out_dir}/")
 
 

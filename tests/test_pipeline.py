@@ -256,6 +256,37 @@ class PipelineIO(unittest.TestCase):
             self.assertFalse((Path(tmp) / "m4.json.partial").exists())
 
 
+class LetterAI(unittest.TestCase):
+    """The local model may only rephrase: every number must come from the calculation."""
+
+    @classmethod
+    def setUpClass(cls):
+        import letters
+        cls.lt = letters
+        cls.row = pd.read_csv(SPACE_REPORT, dtype={"notice_id": str, "related_notice_id": str}).iloc[0]
+        cls.facts = letters.letter_facts(cls.row, "space", 3074)
+
+    def test_accepts_figures_from_the_calculation(self):
+        r, f = self.row, self.facts
+        text = (f"The Administration of Finland has examined the {f['notice type']} information for {f['network']} "
+                f"in {f['ific']}. The calculated pfd of {f['calculated pfd dB(W/m2)']} dB(W/m2) exceeds the limit of "
+                f"{f['limit dB(W/m2)']} dB(W/m2) by {f['exceedance dB']} dB in the band {f['frequency band MHz']} MHz.")
+        self.assertIsNone(self.lt.check_paragraph(text, f))
+
+    def test_rejects_invented_or_altered_numbers(self):
+        f = self.facts
+        text = (f"The network {f['network']} produces a pfd exceeding the limit by 99.9 dB, which affects "
+                f"Finnish services in BR IFIC (Space Services). Finland requests a reply within 30 days.")
+        self.assertIn("numbers not in the calculation", self.lt.check_paragraph(text, f))
+
+    def test_template_unchanged_without_ai_and_fallback_when_server_down(self):
+        plain = self.lt.template_letter(self.row, 3074)
+        self.assertEqual(self.lt.make_letter(self.row, "space", 3074)[0], plain)
+        intro, why = self.lt.ai_intro(self.facts, url="http://127.0.0.1:9")
+        self.assertIsNone(intro)
+        self.assertIn("template kept", why)
+
+
 class TerrestrialPhysics(unittest.TestCase):
     def test_free_space_reference(self):
         # P.1546: 1 kW e.r.p. free-space field 106.9 - 20log(d) dB(uV/m)

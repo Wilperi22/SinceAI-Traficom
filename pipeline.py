@@ -255,7 +255,10 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
                                            cfg.min_exceedance_db, audit)
         for _, f in alerts.iterrows():
             name = f"{f['country']}_{f['notice_id']}_{str(f['network_name']).replace('/', '-')}.txt"
-            (out / "letters" / name).write_text(lt.template_letter(f, ific), encoding="utf-8")
+            text, status = lt.make_letter(f, "space", ific, cfg.ai_letters, cfg.ai_model)
+            (out / "letters" / name).write_text(text, encoding="utf-8")
+            if cfg.ai_letters:
+                log(f"    letter {f['notice_id']}: {status}")
     else:
         border = None
         if cfg.border.exists():
@@ -269,8 +272,10 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
         alerts, concerns = tr.terrestrial_report(db, stations, m4, ific, cfg.min_exceedance_db,
                                                  tr.NEAR_LIMIT_DB, border, audit, previous_databases(ific))
         for _, f in alerts.iterrows():
-            (out / "letters" / f"T_{f['country']}_{f['notice_id']}.txt").write_text(
-                lt.terrestrial_letter(f, ific), encoding="utf-8")
+            text, status = lt.make_letter(f, "terrestrial", ific, cfg.ai_letters, cfg.ai_model)
+            (out / "letters" / f"T_{f['country']}_{f['notice_id']}.txt").write_text(text, encoding="utf-8")
+            if cfg.ai_letters:
+                log(f"    letter {f['notice_id']}: {status}")
 
     ie.write_outputs(alerts, out / "alerts.csv")
     ie.write_outputs(concerns, out / "concerns.csv")
@@ -423,6 +428,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--border", type=Path, default=DEFAULTS["border"])
     parser.add_argument("--allow-free-space", action="store_true",
                         help="Run terrestrial screening without Py1546 (free-space upper bound, REVIEW only)")
+    parser.add_argument("--ai-letters", action="store_true",
+                        help="Opening paragraph of each letter by a local model (Ollama); figures verified, template on failure")
+    parser.add_argument("--ai-model", default="llama3.2:3b", help="Ollama model for --ai-letters")
     parser.add_argument("--report-issues", type=int, default=12, help="Issues per kind kept in report.html")
     return parser.parse_args()
 

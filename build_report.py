@@ -690,7 +690,10 @@ function stationsBlock(ids){
 function letterBlock(key, title){
   const text = D.letters[key];
   if (!text) return `<p class="note">No letter is drafted for concerns; letters are prepared for alerts only.</p>`;
-  return `<div class="btns"><button class="btn primary" data-copy>Copy letter</button><button class="btn" data-dl="${esc(title)}">Download .txt</button></div><pre class="letter">${esc(text)}</pre>`;
+  const ai = /drafted by a local language model \(([^)]+)\)/.exec(text);
+  const tag = ai ? `<span class="badge" title="The opening paragraph was written by a local language model from the calculated facts; every number in it was checked against the technical summary."><i style="background:var(--accent)"></i>AI-assisted opening (${esc(ai[1])}), figures verified</span>`
+                 : `<span class="note">Template letter (no AI)</span>`;
+  return `<div class="btns"><button class="btn primary" data-copy>Copy letter</button><button class="btn" data-dl="${esc(title)}">Download .txt</button><span style="align-self:center;margin-left:6px">${tag}</span></div><pre class="letter">${esc(text)}</pre>`;
 }
 function openDetail(k, r, list){
   const pool = list || (NAV && NAV.k === k && NAV.rows.includes(r) ? NAV.rows : rowsOf(k));
