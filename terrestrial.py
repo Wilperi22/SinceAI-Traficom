@@ -35,7 +35,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from inspection_engine import load_m4, load_stations, provenance, write_outputs
+from inspection_engine import load_m4, load_stations, open_db, provenance, write_outputs
 
 # Py1546 6.1 still calls np.mat, removed in NumPy 2.0; it was an alias of np.asmatrix.
 if not hasattr(np, "mat"):
@@ -223,7 +223,7 @@ def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame,
                        audit: list[str] | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     audit = audit if audit is not None else []
     note = audit.append
-    with sqlite3.connect(database) as connection:
+    with open_db(database) as connection:
         terra = pd.read_sql_query(TERRA_SQL, connection)
         ant = pd.read_sql_query(ANT_SQL, connection)
         coord = pd.read_sql_query(COORD_SQL, connection)
@@ -408,16 +408,19 @@ def main() -> None:
                              "geodata/finland_boundaries.csv from build_boundaries.py (Natural Earth 1:10m)")
     parser.add_argument("--min-exceedance-db", type=float, default=MIN_EXCEEDANCE_MARGIN_DB)
     parser.add_argument("--near-limit-db", type=float, default=NEAR_LIMIT_DB)
+    parser.add_argument("--allow-free-space", action="store_true",
+                        help="Run without Py1546: free-space upper bound, every case REVIEW:P1546_UNAVAILABLE")
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--concerns-output", type=Path, default=None)
     parser.add_argument("--audit-output", type=Path, default=None)
     args = parser.parse_args()
-    if P1546 is None:
-        import sys
-        print("WARNING: Py1546 is not installed in this interpreter - falling back to FREE SPACE; every case "
-              "becomes REVIEW:P1546_UNAVAILABLE and no alerts are produced. Use the project venv "
-              "(.venv/bin/python) or: pip install \"git+https://github.com/eeveetza/Py1546/#egg=Py1546\"",
-              file=sys.stderr)
+    if P1546 is None and not args.allow_free_space:
+        raise SystemExit("Py1546 (ITU-R P.1546-6) is not installed in this interpreter. Use the project venv "
+                         "(.venv/bin/python) or pip install -r requirements.txt; --allow-free-space runs a "
+                         "free-space upper-bound screening that produces REVIEW concerns only.")
+    if not args.terrestrial_db.is_file() or args.terrestrial_db.stat().st_size == 0:
+        raise SystemExit(f"Terrestrial IFIC database not found or empty: {args.terrestrial_db} "
+                         f"(convert it with convert_mdb.py, or run pipeline.py on the .zip/.mdb)")
     output = args.output or Path(f"terrestrial_{args.ific_number}_report.csv")
     concerns_output = args.concerns_output or Path(f"terrestrial_{args.ific_number}_concerns.csv")
     audit_output = args.audit_output or Path(f"terrestrial_{args.ific_number}_audit.txt")

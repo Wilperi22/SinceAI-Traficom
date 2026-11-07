@@ -10,7 +10,8 @@ draft correspondence and a self-contained HTML report.
 ## Quick start
 
 ```bash
-python -m venv .venv && .venv/bin/pip install -r requirements.txt   # needs mdbtools for .mdb input
+python -m venv .venv && .venv/bin/pip install -r requirements.txt   # needs mdbtools for .mdb input;
+                                                                     # also installs Py1546 (ITU-R P.1546-6) from GitHub
 .venv/bin/python pipeline.py 3083                                    # download Space IFIC 3083 from the ITU and analyse it
 cp ~/Downloads/<terrestrial IFIC>.zip inbox/ && .venv/bin/python pipeline.py   # or drop any .zip/.mdb/.sqlite in inbox/
 xdg-open report.html
@@ -30,7 +31,7 @@ Unattended every two weeks (cron):
 | **Transform** | Space: `inspection_engine.py`. Terrestrial: `terrestrial.py`. Draft letters for every alert: `letters.py`. |
 | **Load** | `runs/<kind>_<ific>/` (alerts.csv/.json, concerns.csv/.json, audit.txt, letters/), cumulative `results.sqlite` (runs + findings of every issue), `report.html` (issue selector, history). |
 
-Files already processed (same SHA-256) are skipped; `--force` re-runs them, `--report-only` rebuilds the page.
+Files already processed (same SHA-256) are skipped; `--force` re-runs them, `--report-only` rebuilds the page. Terrestrial screening requires Py1546; without it the pipeline stops with an error unless `--allow-free-space` is given (free-space upper bound, every case REVIEW only).
 
 ## What is checked
 

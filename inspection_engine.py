@@ -52,6 +52,24 @@ CONCERN_PRIORITY = ["SUB_QA_EXCEEDANCE", "LIMIT_NOT_APPLICABLE", "WORST_CASE_ISS
 TERRESTRIAL_M4 = r"FIXED|MOBILE|BROADCASTING|AERONAUTICAL|MARITIME|RADIOLOCATION|RADIONAVIGATION|AMATEUR|METEOROLOGICAL AIDS"
 
 
+def open_db(path: Path) -> sqlite3.Connection:
+    """Open an IFIC SQLite database read-only. sqlite3.connect() would silently create an
+    empty file for a missing path (GitHub issue #6)."""
+    path = Path(path)
+    if not path.is_file() or path.stat().st_size == 0:
+        raise FileNotFoundError(f"IFIC database not found or empty: {path} (run pipeline.py or convert_mdb.py first)")
+    return sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
+
+
+def overlaps_any(lo: np.ndarray, hi: np.ndarray, int_min: np.ndarray, int_max: np.ndarray) -> np.ndarray:
+    """For each half-open [lo, hi): does any interval [int_min, int_max) overlap it? O(n log n), no n x m matrix."""
+    order = np.argsort(int_min)
+    mins, run_max = int_min[order], np.maximum.accumulate(int_max[order])
+    idx = np.searchsorted(mins, hi, side="left")            # intervals starting before hi: [0, idx)
+    best = np.where(idx > 0, run_max[np.maximum(idx - 1, 0)], -np.inf)
+    return best > lo
+
+
 def is_terrestrial_m4(services: pd.Series) -> pd.Series:
     """True for M4 rows of a terrestrial service. Each M4 row holds one service; satellite
     services ('MOBILE-SATELLITE', 'FIXED SATELLITE', ...) contain a terrestrial service name
@@ -313,7 +331,7 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
     note = audit.append
     empty = (pd.DataFrame(columns=OUTPUT_COLUMNS), pd.DataFrame(columns=CONCERN_COLUMNS))
     limits = pd.concat([limits, pd.DataFrame([screening_row(screen_pfd)])], ignore_index=True)
-    with sqlite3.connect(database) as connection:
+    with open_db(database) as connection:
         itu = pd.read_sql_query(SPACE_SQL, connection, params=(ific_number,))
         freqs = pd.read_sql_query(FREQ_SQL, connection, params=(ific_number, 1e7, 0.0))
         orbits = pd.read_sql_query(ORBIT_SQL, connection)
@@ -360,8 +378,16 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
     itu["emission_bw_hz"] = itu["design_emi"].map(emission_bandwidth_hz)
 
     # Frequency overlap with Table 21-4 rows (half-open intervals).
-    cand = itu.merge(freqs, on="grp_id").merge(limits, how="cross")
-    cand = cand[(cand["freq_min"] < cand["freq_max_mhz"]) & (cand["freq_max"] > cand["freq_min_mhz"])]
+    # Pair each assignment only with the limit rows its frequency overlaps (a full cross join
+    # built ~15 M rows and ~10 GB peak memory for IFIC 3074; GitHub issue #2).
+    base = itu.merge(freqs, on="grp_id")
+    parts = []
+    for i in range(len(limits)):
+        row = limits.iloc[[i]]
+        hit = base[(base["freq_min"] < row["freq_max_mhz"].iat[0]) & (base["freq_max"] > row["freq_min_mhz"].iat[0])]
+        if not hit.empty:
+            parts.append(hit.merge(row, how="cross"))
+    cand = pd.concat(parts, ignore_index=True) if parts else base.iloc[0:0].merge(limits.iloc[0:0], how="cross")
     cand = cand[(cand["orbit_y"] == "ANY") | (cand["orbit_y"] == cand["orbit_x"])] if "orbit_y" in cand else cand
     cand = cand.rename(columns={"orbit_x": "orbit"})
     screen = cand["row_id"] == SCREEN_ROW
@@ -388,12 +414,11 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
     no_limit = pd.Series([tuple(k) not in real_keys for k in cand[["grp_id", "freq_min", "freq_max"]].to_numpy()],
                          index=cand.index)
     # Traficom: real Finnish use = M4 (incl. licence-exempt) and the special-interest stations.
-    lo, hi = cand["freq_min"].to_numpy()[:, None], cand["freq_max"].to_numpy()[:, None]
     terr_m4 = m4[is_terrestrial_m4(m4["Services_in_Finland"])]
-    in_finnish_use = pd.Series(((stations["freq_min_mhz"].to_numpy() < hi) &
-                                (stations["freq_max_mhz"].to_numpy() > lo)).any(axis=1) |
-                               ((terr_m4["freq_min_mhz"].to_numpy() < hi) &
-                                (terr_m4["freq_max_mhz"].to_numpy() > lo)).any(axis=1), index=cand.index)
+    use_min = np.concatenate([stations["freq_min_mhz"].to_numpy(), terr_m4["freq_min_mhz"].to_numpy()])
+    use_max = np.concatenate([stations["freq_max_mhz"].to_numpy(), terr_m4["freq_max_mhz"].to_numpy()])
+    in_finnish_use = pd.Series(overlaps_any(cand["freq_min"].to_numpy(), cand["freq_max"].to_numpy(), use_min, use_max),
+                               index=cand.index)
     cand = cand[~screen | (no_limit & in_finnish_use)]
     note(f"Bands without a Table 21-4 limit but overlapping Finnish stations: "
          f"{cand.loc[cand['row_id'] == SCREEN_ROW, 'ntc_id'].nunique()} notices screened at "
@@ -689,6 +714,9 @@ def main() -> None:
     parser.add_argument("--concerns-output", type=Path, default=None)
     parser.add_argument("--audit-output", type=Path, default=None)
     args = parser.parse_args()
+    if not args.space_db.is_file() or args.space_db.stat().st_size == 0:
+        raise SystemExit(f"Space IFIC database not found or empty: {args.space_db} "
+                         f"(convert it with convert_mdb.py, or run pipeline.py on the .zip/.mdb)")
     output = args.space_output or Path(f"space_{args.ific_number}_report.csv")
     args.audit_output = args.audit_output or Path(f"space_{args.ific_number}_audit.txt")
     concerns_output = args.concerns_output or Path(f"space_{args.ific_number}_concerns.csv")

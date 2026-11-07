@@ -92,6 +92,14 @@ class SpacePhysics(unittest.TestCase):
         self.assertEqual(data["37500_40000_FSS_MSS_NGSO"]["max_satellites"], 99)  # RR fn 11 (21.16.4)
         self.assertEqual(data["AP5_2483.5_2500_MSS_NGSO"]["curve"][0][1], -124.5)  # App. 5 NOTE 9 lists Finland
 
+    def test_overlaps_any_matches_brute_force(self):
+        rng = np.random.default_rng(1)
+        lo = rng.uniform(0, 100, 500); hi = lo + rng.uniform(0, 5, 500)
+        a = rng.uniform(0, 100, 80); b = a + rng.uniform(0, 3, 80)
+        brute = ((a[None, :] < hi[:, None]) & (b[None, :] > lo[:, None])).any(axis=1)
+        self.assertTrue((ie.overlaps_any(lo, hi, a, b) == brute).all())
+        self.assertFalse(ie.overlaps_any(np.array([10.0]), np.array([20.0]), np.array([20.0]), np.array([30.0]))[0])  # touching
+
     def test_terrestrial_m4_excludes_satellite_services(self):
         """GitHub issue #1: 'MOBILE-SATELLITE' etc. must not count as terrestrial Finnish use."""
         services = pd.Series(["MOBILE-SATELLITE (SPACE-TO-EARTH)", "FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH)",

@@ -11,6 +11,8 @@ verbatim, otherwise the template draft is used.
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -99,7 +101,7 @@ ADMINISTRATIONS = {
     "LBY": "Libya",
 }
 
-MODEL = "claude-opus-5"
+MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-5")   # override with --model or ANTHROPIC_MODEL
 
 
 def key_figures(f: pd.Series) -> list[str]:
@@ -170,16 +172,17 @@ Traficom - Spectrum and Space
 """
 
 
-def polish(draft: str, figures: list[str]) -> str | None:
-    """Ask Claude to improve the prose; return None if unavailable or figures changed."""
+def polish(draft: str, figures: list[str], model: str = MODEL) -> str | None:
+    """Ask Claude to improve the prose; return None (with the reason printed) if unavailable or figures changed."""
     try:
         import anthropic
     except ImportError:
+        print("  polish skipped: the anthropic package is not installed (pip install anthropic)", file=sys.stderr)
         return None
     client = anthropic.Anthropic()
     try:
         response = client.beta.messages.create(
-            model=MODEL,
+            model=model,
             max_tokens=16000,
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
@@ -189,13 +192,30 @@ def polish(draft: str, figures: list[str]) -> str | None:
                     "facts, limits or regulatory conclusions that are not in the draft. Return only the letter."),
             messages=[{"role": "user", "content": draft}],
         )
-    except anthropic.APIError as exc:
-        print(f"  polish skipped: {type(exc).__name__}")
+    except anthropic.AuthenticationError as exc:
+        print(f"  polish skipped: authentication failed - check ANTHROPIC_API_KEY ({exc.message})", file=sys.stderr)
+        return None
+    except anthropic.NotFoundError as exc:
+        print(f"  polish skipped: model {model!r} not found - use --model ({exc.message})", file=sys.stderr)
+        return None
+    except anthropic.RateLimitError as exc:
+        print(f"  polish skipped: rate limited after the SDK's automatic retries ({exc.message})", file=sys.stderr)
+        return None
+    except anthropic.APIStatusError as exc:
+        print(f"  polish skipped: API error {exc.status_code}: {exc.message}", file=sys.stderr)
+        return None
+    except anthropic.APIConnectionError as exc:
+        print(f"  polish skipped: cannot reach the API ({exc})", file=sys.stderr)
         return None
     if response.stop_reason in ("refusal", "max_tokens"):
+        print(f"  polish skipped: stop_reason {response.stop_reason}", file=sys.stderr)
         return None
     text = "".join(b.text for b in response.content if b.type == "text").strip()
-    return text if all(fig in text for fig in figures) else None
+    missing = [fig for fig in figures if fig not in text]
+    if missing:
+        print(f"  polish rejected: figures changed or missing {missing}; template kept", file=sys.stderr)
+        return None
+    return text
 
 
 def terrestrial_letter(f: pd.Series, ific: int) -> str:
@@ -254,6 +274,7 @@ def main() -> None:
     parser.add_argument("--out-dir", type=Path, default=Path("letters"), help="Where to write the drafts (the pipeline writes them to runs/<kind>_<ific>/letters/)")
     parser.add_argument("--terrestrial-report", type=Path, default=Path("runs/terrestrial_3076/alerts.csv"))
     parser.add_argument("--terrestrial-ific", type=int, default=3076)
+    parser.add_argument("--model", default=MODEL, help="Claude model for --polish (default %(default)s)")
     parser.add_argument("--polish", action="store_true", help="Polish prose with Claude (needs credentials)")
     args = parser.parse_args()
 
@@ -263,7 +284,7 @@ def main() -> None:
         draft = template_letter(f, args.ific_number)
         source = "template"
         if args.polish:
-            polished = polish(draft, key_figures(f))
+            polished = polish(draft, key_figures(f), args.model)
             if polished:
                 draft, source = polished, "template + Claude polish (figures verified)"
         path = args.out_dir / f"{f['country']}_{f['notice_id']}_{str(f['network_name']).replace('/', '-')}.txt"

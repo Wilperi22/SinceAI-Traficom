@@ -2,7 +2,7 @@ SPACE IFIC 3074 - pipeline run
 Source: ific3074.sqlite (sha256 a63ead900ebd90e55fcf9629de7d8d8501a8db16aacebabe7a954a6a1287cbf9)
 Database: ific3074.sqlite
 Alert gate: margin >= 0 dB; near-limit 6 dB
-Run (UTC): 2026-11-07T17:24:50+00:00
+Run (UTC): 2026-11-07T17:35:18+00:00
 Input ific3074.sqlite: sha256 a63ead900ebd90e55fcf9629de7d8d8501a8db16aacebabe7a954a6a1287cbf9 (348741632 bytes)
 Input pfd.json: sha256 66b6bf5430b71c29cee0ed0ab7a72676029e4932d5e7d20b3a90f3ecc3bf0f61 (13514 bytes)
 Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
@@ -14,9 +14,9 @@ REVIEW (not exported): 0 groups lack antenna gain or power data
 Frequency/orbit overlaps with Table 21-4: 235768; service mismatch dropped: 10142
 Bands without a Table 21-4 limit but overlapping Finnish stations: 97 notices screened at -150 dB(W/m2) in 4 kHz
 Inter-satellite-only groups in 13 notices: evaluated worst case (peak gain toward Earth) and reported as WORST_CASE_ISS concerns, not alerts
-DATA_QUALITY: 369 emissions where pwr_ds_max x bandwidth exceeds pep_max by >3 dB; their density is derived from pep_max spread over the emission bandwidth instead, e.g. INTELSAT7 66E (95500027) 80K0F3X-- pwr_ds_max=-49.0 pep_max=-6.0; INTELSAT7 66E (95500027) 80K0GXD-- pwr_ds_max=-49.0 pep_max=-6.0; INTELSAT7 66E (95500027) 30M0FXW-- pwr_ds_max=-50.099998 pep_max=12.9; INTELSAT7 66E (95500027) 36M0F8W-- pwr_ds_max=-45.700001 pep_max=12.9; INTELSAT7 66E (95500027) 25M0F8W-- pwr_ds_max=-45.700001 pep_max=12.9
+DATA_QUALITY: 369 emissions where pwr_ds_max x bandwidth exceeds pep_max by >3 dB; their density is derived from pep_max spread over the emission bandwidth instead, e.g. SECOMSAT-5-78E (124520194) 600KG2D-- pwr_ds_max=-39.0 pep_max=3.0; CHINASAT-G-33.5E (124520184) 800KFXD-- pwr_ds_max=-45.299999 pep_max=10.5; CHINASAT-H-60.5E (124520183) 800KFXD-- pwr_ds_max=-45.299999 pep_max=10.5; TIANQI-3E-2 (124545392) 7M00G7W-- pwr_ds_max=-58.400002 pep_max=3.0; AE4LA (126545060) 500KG1D-- pwr_ds_max=-61.200001 pep_max=-7.6999998
 Not visible from Finland or no orbit data: 37 notices dropped
 Evaluated 113878 group/emission/row combinations over 117 notices; exceedances >0 dB: 22672, >= 0 dB: 22672 in 51 notices
 ITU BR findings X/21.16 in this issue: 3 notices; alerts here: 1; listed as BR_UNFAVOURABLE_21_16 concerns: 2
 Concerns (separate CSV, networks without an alert): 48 - SUB_QA_EXCEEDANCE: 0, LIMIT_NOT_APPLICABLE: 1, WORST_CASE_ISS: 2, BR_UNFAVOURABLE_21_16: 2, NEAR_LIMIT: 27, NO_LIMIT_HIGH_PFD: 16
-Exported 34 alerts and 48 concerns in 16.6 s
+Exported 34 alerts and 48 concerns in 3.4 s

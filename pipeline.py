@@ -32,6 +32,7 @@ import shutil
 import sqlite3
 import sys
 import time
+import traceback
 import urllib.request
 import zipfile
 from datetime import datetime, timezone
@@ -120,7 +121,8 @@ def download(spec: str) -> Path:
 
 def detect(db: Path) -> tuple[str, int]:
     """('space'|'terrestrial', IFIC number) from the database content."""
-    with sqlite3.connect(db) as con:
+    from inspection_engine import open_db
+    with open_db(db) as con:
         tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
         if {"notice", "grp", "emiss"} <= tables:
             ific = con.execute("SELECT wic_no, COUNT(*) FROM notice GROUP BY wic_no ORDER BY 2 DESC").fetchone()
@@ -153,6 +155,11 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
     import letters as lt
     import terrestrial as tr
 
+    # Check prerequisites before the previous results for this issue are replaced.
+    if kind == "terrestrial" and tr.P1546 is None and not cfg.allow_free_space:
+        raise RuntimeError("Py1546 (ITU-R P.1546-6) is not installed - terrestrial results would be free-space "
+                           "upper bounds only. Install it (pip install -r requirements.txt) or pass "
+                           "--allow-free-space to accept REVIEW-only output.")
     started = time.time()
     out = RUNS / f"{kind}_{ific}"
     if out.exists():
@@ -179,7 +186,7 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
                      f"P.1546-6 {tr.TIME_PERCENT:g}% time; alert gate {cfg.min_exceedance_db:g} dB")
         audit += ie.provenance([db, cfg.m4, cfg.stations, cfg.border, tr.LAND_MASK_FILE])
         if tr.P1546 is None:
-            log("  WARNING: Py1546 not installed - terrestrial results are free-space REVIEW only")
+            log("  WARNING: Py1546 not installed - terrestrial results are free-space REVIEW only (--allow-free-space)")
         alerts, concerns = tr.terrestrial_report(db, stations, m4, ific, cfg.min_exceedance_db,
                                                  tr.NEAR_LIMIT_DB, border, audit)
         for _, f in alerts.iterrows():
@@ -244,13 +251,15 @@ def main() -> None:
     parser.add_argument("--limits", type=Path, default=DEFAULTS["limits"])
     parser.add_argument("--stations", type=Path, default=DEFAULTS["stations"])
     parser.add_argument("--border", type=Path, default=DEFAULTS["border"])
+    parser.add_argument("--allow-free-space", action="store_true",
+                        help="Run terrestrial screening without Py1546 (free-space upper bound, REVIEW only)")
     parser.add_argument("--report-issues", type=int, default=12, help="Issues per kind kept in report.html")
     cfg = parser.parse_args()
 
     if cfg.refresh_m4:
         try:
             refresh_m4(cfg.m4)
-        except Exception as exc:  # network problems must not stop the screening
+        except (OSError, ValueError, RuntimeError) as exc:  # network/HTTP/JSON problems (URLError is an OSError)
             log(f"M4 refresh failed ({type(exc).__name__}: {exc}); using existing {cfg.m4.name}")
 
     if not cfg.report_only:
@@ -281,9 +290,10 @@ def main() -> None:
                 kind, ific = detect(db)
                 log(f"  detected {kind} IFIC {ific}")
                 process(db, digest, source, kind, ific, cfg)
-            except Exception as exc:
+            except Exception as exc:  # one bad input must not stop the others; keep the traceback
                 failures += 1
                 log(f"  FAILED: {type(exc).__name__}: {exc}")
+                log("  " + traceback.format_exc().strip().replace("\n", "\n  "))
         if failures:
             log(f"{failures} input(s) failed")
 

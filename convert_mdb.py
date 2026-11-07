@@ -36,17 +36,27 @@ def convert(mdb_path: Path, output_db: Path, log=print) -> dict[str, int]:
     cur.execute("PRAGMA temp_store = MEMORY;")
 
     schema_sql = _run("mdb-schema", str(mdb_path), "sqlite").strip()
+    ignored = []
     try:
         cur.executescript(schema_sql)
     except sqlite3.Error:
-        # Fall back to statement-by-statement so one odd DDL statement does not stop the rest.
+        # Fall back to statement-by-statement so one odd DDL statement (e.g. an index or a
+        # relationship comment) does not stop the rest - but a table that cannot be created
+        # is fatal (GitHub issue #4).
         for stmt in schema_sql.split(";"):
             if stmt.strip():
                 try:
                     cur.execute(stmt + ";")
                 except sqlite3.Error as exc:
-                    log(f"    ignored schema statement: {stmt.strip()[:60]}... ({exc})")
+                    if "CREATE TABLE" in stmt.upper():
+                        conn.close()
+                        raise RuntimeError(f"{mdb_path.name}: could not create table: {stmt.strip()[:80]} ({exc})")
+                    ignored.append(f"{stmt.strip()[:60]}... ({exc})")
     conn.commit()
+    if ignored:
+        log(f"  WARNING: {len(ignored)} non-table schema statement(s) ignored:")
+        for item in ignored:
+            log(f"    {item}")
 
     counts: dict[str, int] = {}
     for table in tables:
