@@ -69,9 +69,6 @@ python process_itu_mdb.py /path/to/ific3083.mdb
    - Creates view `vw_space_<NUM>_pfd_inputs` joining all relevant tables
    - Filters: `wic_no = <IFIC_NUM>` AND `emi_rcp = 'E'` (Emission/Reception)
 
-3. **Runs test query** (if pandas available)
-   - Outputs sample rows from the created view
-
 ---
 
 ## Database Schema (`schema.txt`)

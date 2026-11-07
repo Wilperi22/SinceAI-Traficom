@@ -14,6 +14,7 @@ import os
 import sys
 import subprocess
 import sqlite3
+import re
 
 
 def parse_args():
@@ -157,31 +158,10 @@ WHERE n.wic_no = {ific_number}
     print(f"\nCreated view: vw_space_{ific_number}_pfd_inputs")
 
 
-def test_view(conn, ific_number=3074):
-    """Run a sample query against the created view."""
-    try:
-        import pandas as pd
-    except ImportError:
-        print("pandas not installed; skipping view test query")
-        return
-
-    test_query = f"""
-SELECT ntc_id, submitting_country, beam_name, freq_min, freq_max, pwr_ds_max, peak_antenna_gain
-FROM vw_space_{ific_number}_pfd_inputs
-WHERE emi_rcp = 'E'
-LIMIT 5;
-"""
-
-    df = pd.read_sql_query(test_query, conn)
-    print("\nView Output Sample:")
-    print(df)
-
-
 def main():
     mdb_path, output_dir, output_db, mdb_basename = parse_args()
 
     # Extract IFIC number from filename (e.g., "ific3074" -> 3074)
-    import re
     match = re.search(r'(\d+)', mdb_basename)
     ific_number = int(match.group(1)) if match else 3074
 
@@ -202,7 +182,6 @@ def main():
     required_tables = {'notice', 'grp', 'freq', 'emiss', 's_beam', 'geo', 'tr_aff_ntw'}
     if required_tables.issubset(set(tables)):
         create_space_ific_view(conn, ific_number)
-        test_view(conn, ific_number)
     else:
         print("\nRequired tables for Space IFIC view not found; skipping view creation.")
         print(f"Available tables: {', '.join(sorted(tables))}")
