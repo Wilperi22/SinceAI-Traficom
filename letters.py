@@ -249,10 +249,10 @@ Traficom - Spectrum and Space
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--report", type=Path, default=Path("space_3074_report.csv"))
+    parser.add_argument("--report", type=Path, default=Path("runs/space_3074/alerts.csv"))
     parser.add_argument("--ific-number", type=int, default=3074)
-    parser.add_argument("--out-dir", type=Path, default=Path("letters"))
-    parser.add_argument("--terrestrial-report", type=Path, default=Path("terrestrial_3076_report.csv"))
+    parser.add_argument("--out-dir", type=Path, default=Path("letters"), help="Where to write the drafts (the pipeline writes them to runs/<kind>_<ific>/letters/)")
+    parser.add_argument("--terrestrial-report", type=Path, default=Path("runs/terrestrial_3076/alerts.csv"))
     parser.add_argument("--terrestrial-ific", type=int, default=3076)
     parser.add_argument("--polish", action="store_true", help="Polish prose with Claude (needs credentials)")
     args = parser.parse_args()

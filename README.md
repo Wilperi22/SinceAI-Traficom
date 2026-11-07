@@ -82,6 +82,7 @@ outputs. Each audit file records input SHA-256 hashes and model versions.
 
 | File | Description |
 |---|---|
+| `letters.py` | Draft letters (run automatically by the pipeline). Optional `--polish` lets Claude improve the wording and keeps the result only if every figure is unchanged; it needs `pip install anthropic` and an Anthropic API key. |
 | `convert_mdb.py` | MDB -> SQLite converter with per-table row-count verification (used by `pipeline.py`; also `python convert_mdb.py <file.mdb>`) |
 | `build_boundaries.py` | Builds `geodata/` (Finnish land border, territorial sea, land mask) from Natural Earth 1:10m |
 | `Table 21-4.odt`, `interference_check_criteria.txt` | Working notes: RR Table 21-4 extract and the screening criteria |
