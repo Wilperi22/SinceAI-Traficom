@@ -13,6 +13,8 @@ Outputs (geodata/):
                           high-seas corridor).
   land_mask.npz           boolean land raster (0.02 deg) used to split P.1546 paths into
                           Land / Cold-sea zones.
+  map_outline.json        simplified coastlines/borders of Finland and its neighbours for
+                          the maps in report.html.
 
 Approximation: distances are measured from the Natural Earth coastline, not from the
 official straight baselines, so in the archipelago the true territorial sea reaches
@@ -108,6 +110,72 @@ def nearest_km(lat, lon, pts) -> np.ndarray:
     return out
 
 
+MAP_BBOX = (57.5, 71.0, 17.0, 34.0)
+MAP_COUNTRIES = ("FIN", "ALD", "SWE", "NOR", "RUS", "EST", "LVA")
+
+
+def simplify(points: np.ndarray, tolerance: float) -> np.ndarray:
+    """Douglas-Peucker simplification of an open polyline (degrees)."""
+    keep = np.zeros(len(points), dtype=bool)
+    keep[[0, -1]] = True
+    stack = [(0, len(points) - 1)]
+    while stack:
+        a, b = stack.pop()
+        if b <= a + 1:
+            continue
+        seg = points[b] - points[a]
+        rel = points[a + 1:b] - points[a]
+        norm = np.hypot(*seg) or 1e-12
+        dist = np.abs(seg[0] * rel[:, 1] - seg[1] * rel[:, 0]) / norm
+        i = int(np.argmax(dist))
+        if dist[i] > tolerance:
+            keep[a + 1 + i] = True
+            stack += [(a, a + 1 + i), (a + 1 + i, b)]
+    return points[keep]
+
+
+def clip_ring(ring: np.ndarray, bbox) -> np.ndarray:
+    """Sutherland-Hodgman clip of a polygon ring (lon, lat) to bbox = (lat_min, lat_max, lon_min, lon_max)."""
+    lat_min, lat_max, lon_min, lon_max = bbox
+    edges = ((0, lon_min, True), (0, lon_max, False), (1, lat_min, True), (1, lat_max, False))
+    pts = [tuple(p) for p in ring]
+    for axis, value, keep_greater in edges:
+        if not pts:
+            break
+        inside = (lambda q: q[axis] >= value) if keep_greater else (lambda q: q[axis] <= value)
+        out, prev = [], pts[-1]
+        for cur in pts:
+            if inside(cur) != inside(prev):
+                t = (value - prev[axis]) / (cur[axis] - prev[axis])
+                out.append(tuple(prev[i] + t * (cur[i] - prev[i]) for i in range(2)))
+            if inside(cur):
+                out.append(cur)
+            prev = cur
+        pts = out
+    return np.array(pts) if pts else np.empty((0, 2))
+
+
+def map_outline(by_a3: dict, tolerance: float = 0.02) -> dict:
+    """{country: [ring, ...]} clipped to MAP_BBOX and simplified; rings as [[lon, lat], ...]."""
+    out = {}
+    for a3 in MAP_COUNTRIES:
+        rings_out = []
+        for ring in by_a3.get(a3, []):
+            clipped = clip_ring(ring, MAP_BBOX)
+            if len(clipped) < 4:
+                continue
+            # Douglas-Peucker needs a non-degenerate chord: split the closed ring at the vertex
+            # farthest from its start and simplify both halves.
+            k = int(np.argmax(np.hypot(*(clipped - clipped[0]).T)))
+            if k == 0:
+                continue
+            simple = np.vstack([simplify(clipped[:k + 1], tolerance)[:-1], simplify(clipped[k:], tolerance)])
+            if len(simple) >= 4 and np.ptp(simple[:, 0]) + np.ptp(simple[:, 1]) > 0.05:
+                rings_out.append(np.round(simple, 3).tolist())
+        out[a3] = rings_out
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--ne-dir", type=Path, required=True, help="Directory with the Natural Earth GeoJSON files")
@@ -166,6 +234,9 @@ def main() -> None:
             handle.write(f"{lat:.5f},{lon:.5f},land border\n")
         for lat, lon in ts:
             handle.write(f"{lat:.4f},{lon:.4f},territorial sea\n")
+    outline = map_outline(by_a3)
+    (args.out_dir / "map_outline.json").write_text(json.dumps({"bbox": MAP_BBOX, "countries": outline}), encoding="utf-8")
+    print(f"map outline: {sum(len(r) for rings in outline.values() for r in rings)} vertices; ", end="")
     print(f"land border points: {len(border)}, territorial-sea points: {len(ts)}, "
           f"land mask {land.shape} ({land.mean():.0%} land)")
 

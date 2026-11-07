@@ -4,7 +4,7 @@ From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of Estonia (Republic of) (EST)
 Date: 2026-11-07
 Subject: BR IFIC (Terrestrial Services) No. 3075 - land-mobile assignment 93073941
-         (None, 148.575 MHz): field strength at the Finnish border
+         (IRU (mobile area), 148.575 MHz): field strength at the Finnish border
 
 Dear colleagues,
 
@@ -15,7 +15,7 @@ exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2
 
 Technical summary
   Assignment:                 93073941 (adm. ref. EE160MLHAR004), 148.575 MHz, 16.0 kHz, F3E--
-  Transmitter site:           None, 59.4519 N 24.9258 E
+  Transmitter site:           IRU (mobile area), 59.4519 N 24.9258 E
   e.r.p. / antenna height:    8.0 dBW / 2 m
   Worst point in Finland:     territorial sea, 59.8700 N 24.7700 E (17.3 km)
   Path:                       Land 3.1 km + Cold 14.2 km

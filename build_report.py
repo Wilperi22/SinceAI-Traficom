@@ -161,7 +161,9 @@ def load_runs(max_issues: int) -> tuple[dict, dict, list]:
 
 def build(output: Path, max_issues: int = 12, tests: dict | None = None) -> None:
     issues, runs, history = load_runs(max_issues)
+    outline = ROOT / "geodata" / "map_outline.json"
     data = {"generated": datetime.now().strftime("%Y-%m-%d %H:%M"), "issues": issues, "runs": runs,
+            "map": json.loads(outline.read_text(encoding="utf-8")) if outline.exists() else None,
             "history": history, "tests": tests or {"ok": None, "summary": "not run", "names": []},
             "adm": ADMINISTRATIONS}
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
@@ -196,7 +198,7 @@ TEMPLATE = r"""<!doctype html>
 @media (prefers-color-scheme: dark){
   :root{ --bg:#121211; --surface:#1a1a19; --surface-2:#242422; --line:#33332f;
     --ink:#ffffff; --ink-2:#c3c2b7; --ink-3:#97968c; --accent:#3987e5; --accent-ink:#86b6ef;
-    --neutral:#6c6b64; --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme: dark; }
+    --neutral:#6c6b64; --shadow:0 1px 2px rgba(0,0,0,.4); --sea:#1e2a36; color-scheme: dark; }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -236,6 +238,19 @@ input[type=search]{min-width:240px;flex:1 1 240px}
 .slide{display:inline-flex;gap:4px} .slide button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
 .issuesel{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:13px;color:var(--ink-2)}
 .issuesel select{padding:4px 8px}
+.hdr{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.gsearch{position:relative;min-width:280px;flex:0 1 360px}
+.gsearch input{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.gsearch .res{position:absolute;top:100%;left:0;right:0;z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-top:4px;max-height:60vh;overflow:auto}
+.gsearch .res div{padding:7px 10px;cursor:pointer;border-bottom:1px solid var(--line)} .gsearch .res div:hover,.gsearch .res div.act{background:var(--surface-2)}
+.navbar{display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:4px;white-space:nowrap}
+.navbar button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer}
+.navbar button:disabled{opacity:.4;cursor:default}
+.map{width:100%;display:block;border-radius:8px} .map .sea{fill:var(--sea, #dbe7f3)}
+.map .land{fill:var(--surface-2);stroke:var(--ink-3);stroke-width:.6;vector-effect:non-scaling-stroke}
+.map .fin{fill:var(--surface);stroke:var(--ink-2);stroke-width:.9;vector-effect:non-scaling-stroke}
+.map .mk{cursor:pointer} .map text{font:11px system-ui,sans-serif;fill:var(--ink)}
+.maplegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:6px}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:12px;color:var(--ink-2);font-weight:600;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--surface)}
@@ -286,7 +301,8 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
 <body>
 <header><div class="wrap">
   <h1>IFIC Interference Screening for Finland <span class="draft">Draft for expert review</span></h1>
-  <div class="sub" id="subtitle"></div>
+  <div class="hdr"><div><div class="sub" id="subtitle"></div></div>
+    <div class="gsearch"><input id="gq" type="search" placeholder="Find any satellite, station, notice or country…" autocomplete="off" aria-label="Search all findings"><div class="res" id="gres" hidden></div></div></div>
   <div class="issuesel"><label>Space IFIC <select id="selS"></select></label><label>Terrestrial IFIC <select id="selT"></select></label><span id="runinfo"></span></div>
   <nav role="tablist">
     <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
@@ -310,6 +326,10 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
       <h3 style="margin-top:0">Top findings (largest exceedance)</h3>
       <div id="top"></div>
     </div>
+  </div>
+  <div class="card" style="margin-top:16px" id="mapcard">
+    <h3 style="margin-top:0">Terrestrial findings around Finland (IFIC <span class="tifc"></span>) - click a marker</h3>
+    <div id="ovmap"></div>
   </div>
   <div class="card" style="margin-top:16px" id="historycard">
     <h3 style="margin-top:0">Alerts per IFIC issue (all processed issues)</h3>
@@ -336,6 +356,8 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
     <select data-cls="space"><option value="">All result classes</option></select>
     <select data-prio="space"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
     <span class="slide"><button data-slide="space" data-d="-1" title="Scroll table left">&#9664;</button><button data-slide="space" data-d="1" title="Scroll table right">&#9654;</button></span>
+    <button class="btn" data-reset="space" title="Clear search and filters">Reset</button>
+    <button class="btn" data-export="space" title="Download the rows currently shown as CSV">Export CSV</button>
     <span class="note" data-count="space"></span>
   </div>
   <div class="tablewrap"><table id="tspace"></table></div>
@@ -349,6 +371,8 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
     <select data-cls="terra"><option value="">All result classes</option></select>
     <select data-prio="terra"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
     <span class="slide"><button data-slide="terra" data-d="-1" title="Scroll table left">&#9664;</button><button data-slide="terra" data-d="1" title="Scroll table right">&#9654;</button></span>
+    <button class="btn" data-reset="terra" title="Clear search and filters">Reset</button>
+    <button class="btn" data-export="terra" title="Download the rows currently shown as CSV">Export CSV</button>
     <span class="note" data-count="terra"></span>
   </div>
   <div class="tablewrap"><table id="tterra"></table></div>
@@ -469,7 +493,7 @@ const SPACE = [...D.space.alerts, ...D.space.concerns], TERRA = [...D.terra.aler
 
 // ---------- header / tabs ----------
 $("#subtitle").textContent = `Space IFIC ${D.spaceIfic} and Terrestrial IFIC ${D.terraIfic} screened against Finnish frequency use · generated ${D.generated}`;
-$(".sifc").textContent = D.spaceIfic; $(".tifc").textContent = D.terraIfic;
+$$(".sifc").forEach(e => e.textContent = D.spaceIfic); $$(".tifc").forEach(e => e.textContent = D.terraIfic);
 function showTab(name, keepHash){ if (!keepHash) history.replaceState(null, "", "#" + name); $$("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name)); $$("main > section").forEach(s => s.hidden = s.id !== "tab-" + name); closeDrawer(); }
 $$("nav button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
@@ -499,7 +523,7 @@ $$("#admchart .row").forEach(el => { el.onmousemove = e => tip(e, el.dataset.tip
 const topRows = [...D.space.alerts.map(r => ({r, k:"space", m:r.margin_of_exceedance, name:r.network_name})),
              ...D.terra.alerts.map(r => ({r, k:"terra", m:r.margin_db, name:r.site_name}))].sort((a,b) => prioRank(a.r) - prioRank(b.r) || b.m-a.m).slice(0,8);
 $("#top").innerHTML = `<table class="plain"><tbody>${topRows.map((x,i) => `<tr data-i="${i}" style="cursor:pointer"><td><b>${esc(x.name)}</b><div class="note">${esc(admName(x.r.country))} · ${x.k === "space" ? "Space" : "Terrestrial"} · ${esc(x.r.frequency_mhz)} MHz</div></td><td>${badge(x.r.result_class)}</td><td class="num"><b>${sgn(x.m)} dB</b></td></tr>`).join("")}</tbody></table>`;
-$$("#top tr").forEach(el => el.onclick = () => { const x = topRows[el.dataset.i]; openDetail(x.k, x.r); });
+$$("#top tr").forEach(el => el.onclick = () => { const x = topRows[el.dataset.i]; openDetail(x.k, x.r, x.k === "space" ? D.space.alerts : D.terra.alerts); });
 
 // ---------- history ----------
 const maxH = Math.max(1, ...D.history.map(h => h.alerts));
@@ -510,7 +534,93 @@ $$("#history .row").forEach((el, i) => { el.onmousemove = e => tip(e, el.dataset
   el.onclick = () => { const h = D.history[i]; P.set(h.kind, h.ific); location.search = P.toString(); }; });
 $$("[data-slide]").forEach(b => b.onclick = () => $(`#t${b.dataset.slide}`).parentElement.scrollBy({left: +b.dataset.d * 400, behavior: "smooth"}));
 
+// ---------- map (SVG, offline; outline from geodata/map_outline.json) ----------
+const COSL = Math.cos(63 * Math.PI / 180);
+function mapSVG({bbox, markers = [], lines = [], circles = [], height = 420}) {
+  if (!D.map) return `<p class="note">Map outline not available (run build_boundaries.py).</p>`;
+  const [la0, la1, lo0, lo1] = bbox, X = lo => (lo - lo0) * COSL, Y = la => la1 - la;
+  const w = (lo1 - lo0) * COSL, h = la1 - la0, k = Math.max(w, h * 1.6) / 420;   // marker scale ~ px
+  const ring = r => "M" + r.map(([lo, la]) => `${X(lo).toFixed(3)},${Y(la).toFixed(3)}`).join("L") + "Z";
+  const land = Object.entries(D.map.countries).map(([c, rings]) =>
+    `<path class="${c === "FIN" || c === "ALD" ? "fin" : "land"}" d="${rings.map(ring).join("")}"/>`).join("");
+  const ls = lines.map(l => `<line x1="${X(l.a[1])}" y1="${Y(l.a[0])}" x2="${X(l.b[1])}" y2="${Y(l.b[0])}" stroke="${l.color}" stroke-width="${2*k}" stroke-dasharray="${6*k} ${4*k}"/>`).join("");
+  const cs = circles.map(c => `<ellipse cx="${X(c.lon)}" cy="${Y(c.lat)}" rx="${c.km / 111 / Math.cos(c.lat*Math.PI/180) * COSL}" ry="${c.km / 111}" fill="${c.color}" fill-opacity=".12" stroke="${c.color}" stroke-width="${1*k}"/>`).join("");
+  const ms = markers.map((m, i) => {
+    const x = X(m.lon), y = Y(m.lat), s = (m.size || 7) * k;
+    const shape = m.shape === "tri" ? `<path d="M${x},${y - s}L${x + s},${y + s * .8}L${x - s},${y + s * .8}Z"/>` : `<circle cx="${x}" cy="${y}" r="${s * .8}"/>`;
+    return `<g class="mk" data-m="${i}" fill="${m.color}" stroke="var(--surface)" stroke-width="${1.2*k}">${shape}${m.label ? `<text x="${x + s * 1.4}" y="${y + s * .4}" style="font-size:${13*k}px;fill:var(--ink);stroke:var(--surface);stroke-width:${3*k}px;paint-order:stroke">${esc(m.label)}</text>` : ""}</g>`;
+  }).join("");
+  return `<svg class="map" viewBox="0 0 ${w} ${h}" style="height:${height}px" role="img" aria-label="Map of Finland and neighbouring areas"><rect class="sea" width="${w}" height="${h}"/>${land}${cs}${ls}${ms}</svg>`;
+}
+const PCOL = p => ({High: "var(--critical)", Medium: "var(--serious)", Low: "var(--warning)"}[p] || "var(--neutral)");
+function renderOverviewMap() {
+  const rows = TERRA.filter(r => r.latitude != null);
+  if (!rows.length) { $("#ovmap").innerHTML = `<p class="note">No terrestrial findings in this issue.</p>`; return; }
+  const markers = rows.map(r => ({lat: r.latitude, lon: r.longitude, shape: r._k === "alert" ? "tri" : "dot",
+    color: r._k === "alert" ? PCOL(r.priority) : "var(--neutral)", size: r._k === "alert" ? 8 : 6, r}));
+  const lats = rows.map(r => r.latitude), lons = rows.map(r => r.longitude);
+  const bbox = [Math.min(59.0, ...lats) - .5, Math.max(70.2, ...lats) + .3, Math.min(19.5, ...lons) - 1, Math.max(31.8, ...lons) + 1];
+  $("#ovmap").innerHTML = mapSVG({bbox, markers, height: 520}) + `<div class="maplegend">
+    <span><span style="color:var(--critical)">▲</span> alert, high priority</span><span><span style="color:var(--serious)">▲</span> medium</span>
+    <span><span style="color:var(--warning)">▲</span> low</span><span><span style="color:var(--neutral)">●</span> concern</span></div>`;
+  $$("#ovmap .mk").forEach(g => { const m = markers[+g.dataset.m];
+    g.onmousemove = e => tip(e, `${m.r.site_name} (${m.r.country}) · ${m.r.frequency_mhz} MHz · ${sgn(m.r.margin_db)} dB`);
+    g.onmouseleave = () => tip(); g.onclick = () => { tip(); openDetail("terra", m.r, TERRA); }; });
+}
+
+// ---------- global search ----------
+function searchAll(q) {
+  q = q.toLowerCase().trim(); if (q.length < 2) return [];
+  const pool = [...SPACE.map(r => ({k: "space", r, name: r.network_name})), ...TERRA.map(r => ({k: "terra", r, name: r.site_name}))];
+  return pool.filter(x => [x.name, x.r.notice_id, x.r.country, D.adm[x.r.country], x.r.frequency_mhz, x.r.adm_ref_id]
+    .some(v => String(v ?? "").toLowerCase().includes(q))).slice(0, 15);
+}
+(function setupSearch() {
+  const inp = $("#gq"), box = $("#gres"); let hits = [], act = 0;
+  const pick = i => { const h = hits[i]; if (!h) return; box.hidden = true; inp.value = ""; showTab(h.k);
+    setMode(h.k, h.r._k === "alert" ? "alerts" : "concerns"); openDetail(h.k, h.r, rowsOf(h.k)); };
+  const draw = () => { box.innerHTML = hits.length ? hits.map((h, i) => `<div data-i="${i}" class="${i === act ? "act" : ""}"><b>${esc(h.name)}</b>
+      <span class="note">· ${h.k === "space" ? "Space" : "Terrestrial"} · ${esc(admName(h.r.country))} · ${esc(h.r.frequency_mhz)} MHz · ${esc(h.r._k)}</span></div>`).join("")
+      : `<div class="note">No match in the selected issues.</div>`;
+    box.hidden = false; $$("div[data-i]", box).forEach(d => d.onmousedown = e => { e.preventDefault(); pick(+d.dataset.i); }); };
+  inp.oninput = () => { hits = searchAll(inp.value); act = 0; if (inp.value.trim().length < 2) box.hidden = true; else draw(); };
+  inp.onkeydown = e => { if (box.hidden) return;
+    if (e.key === "ArrowDown") { act = Math.min(act + 1, hits.length - 1); draw(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { act = Math.max(act - 1, 0); draw(); e.preventDefault(); }
+    else if (e.key === "Enter") pick(act); else if (e.key === "Escape") box.hidden = true; };
+  inp.onblur = () => setTimeout(() => box.hidden = true, 150);
+})();
+
+// ---------- column help ----------
+const HELP = {
+  "Priority": "Review order: High / Medium / Low (rules in Method & criteria)",
+  "Margin (dB)": "Calculated value minus the cited limit; positive = exceeds",
+  "Result": "Alert class (exceeds limit / coordination required) or concern class",
+  "FI stations": "Traficom special-interest stations whose RX/TX frequencies overlap the assignment",
+  "Orbit": "GSO with orbital longitude, or non-GSO with altitude",
+  "Type": "ITU notice type: API/A advance publication, CR/C coordination request, Notification (Art. 11)",
+  "Field (dBµV/m)": "Worst-case field strength on Finnish territory, ITU-R P.1546-6",
+  "Distance (km)": "From the transmitter (mobile: edge of its service circle) to the worst Finnish point",
+  "Coordinated w/ FIN": "ITU data records coordination with Finland - verify against the Traficom register",
+  "vs earlier issues": "NEW / REPUBLISHED / MODIFIED compared with earlier processed Terrestrial IFICs",
+  "Change": "Action in this IFIC: NEW (ADD) or MODIFIED",
+};
+
+// ---------- export / reset ----------
+function exportCSV(k) {
+  const rows = STATE[k].view || [], cols = Object.keys(rows[0] || {}).filter(c => !c.startsWith("_"));
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csv = [cols.map(q).join(","), ...rows.map(r => cols.map(c => q(r[c])).join(","))].join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"}));
+  a.download = `${k === "space" ? "space_" + D.spaceIfic : "terrestrial_" + D.terraIfic}_${STATE[k].mode}_view.csv`; a.click();
+}
+$$("[data-export]").forEach(b => b.onclick = () => exportCSV(b.dataset.export));
+$$("[data-reset]").forEach(b => b.onclick = () => { const k = b.dataset.reset;
+  [`[data-search=${k}]`, `[data-adm=${k}]`, `[data-cls=${k}]`, `[data-prio=${k}]`].forEach(sel => $(sel).value = "");
+  STATE[k].sort = null; render(k); });
+
 // ---------- tables ----------
+setTimeout(renderOverviewMap);
 const COLS = {
   space: [
     ["#", r => r._rank, "num"], ["Network", r => r.network_name, "name"], ["Priority", r => r.priority, "prio", prioRank], ["Admin.", r => r.country], ["Notice", r => r.notice_id],
@@ -554,14 +664,16 @@ function render(k){
     if (t === "num1") return `<td class="num">${num(v)}</td>`;
     if (t === "num") return `<td class="num">${esc(v)}</td>`;
     return `<td>${esc(v)}</td>`; };
-  $(`#t${k}`).innerHTML = `<thead><tr>${cols.map((col,i) => `<th class="${["num","num1","margin"].includes(col[2])?"num":""}" data-i="${i}">${esc(col[0])}${st.sort===i?(st.dir>0?" ▲":" ▼"):""}</th>`).join("")}</tr></thead>
+  st.view = rows;
+  $(`#t${k}`).innerHTML = `<thead><tr>${cols.map((col,i) => `<th class="${["num","num1","margin"].includes(col[2])?"num":""}" data-i="${i}" title="${esc(HELP[col[0]] || "Click to sort")}">${esc(col[0])}${st.sort===i?(st.dir>0?" ▲":" ▼"):""}</th>`).join("")}</tr></thead>
     <tbody>${rows.map((r,i) => `<tr data-i="${i}">${cols.map(col => cell(col, r)).join("")}</tr>`).join("") || `<tr><td colspan="${cols.length}" class="empty">No rows match the filters.</td></tr>`}</tbody>`;
   $$(`#t${k} th`).forEach(th => th.onclick = () => { const i = +th.dataset.i; st.dir = st.sort === i ? -st.dir : (["num","num1","margin"].includes(cols[i][2]) ? -1 : 1); st.sort = i; render(k); });
-  $$(`#t${k} tbody tr[data-i]`).forEach(tr => tr.onclick = () => { $$(`#t${k} tr.sel`).forEach(x => x.classList.remove("sel")); tr.classList.add("sel"); openDetail(k, rows[tr.dataset.i]); });
+  $$(`#t${k} tbody tr[data-i]`).forEach(tr => tr.onclick = () => { $$(`#t${k} tr.sel`).forEach(x => x.classList.remove("sel")); tr.classList.add("sel"); openDetail(k, rows[tr.dataset.i], rows); });
   $(`[data-count=${k}]`).textContent = `${rows.length} row(s)`;
 }
 
 // ---------- detail drawer ----------
+let NAV = null;   // {k, rows, i} - the list the open finding belongs to (for previous / next)
 // Values are escaped by default (GitHub issue #11); intentional markup must be built with safe`...`,
 // which escapes every interpolated value that is not itself Safe.
 class Safe { constructor(s) { this.s = s; } toString() { return this.s; } }
@@ -580,7 +692,9 @@ function letterBlock(key, title){
   if (!text) return `<p class="note">No letter is drafted for concerns; letters are prepared for alerts only.</p>`;
   return `<div class="btns"><button class="btn primary" data-copy>Copy letter</button><button class="btn" data-dl="${esc(title)}">Download .txt</button></div><pre class="letter">${esc(text)}</pre>`;
 }
-function openDetail(k, r){
+function openDetail(k, r, list){
+  const pool = list || (NAV && NAV.k === k && NAV.rows.includes(r) ? NAV.rows : rowsOf(k));
+  NAV = {k, rows: pool, i: Math.max(0, pool.indexOf(r))};
   const m = marginOf(k, r);
   let head, body;
   if (k === "space") {
@@ -618,15 +732,38 @@ function openDetail(k, r){
       <h3>Affected in Finland</h3>${kv([["M4 services at this frequency", r.m4_service || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
       <h3>Recommended letter</h3>${letterBlock("T:" + r.notice_id, `T_${r.country}_${r.notice_id}`)}`;
   }
+  if (k === "terra" && r.latitude != null) {
+    const pts = [[r.latitude, r.longitude], [r.worst_point_lat, r.worst_point_lon]].filter(p => p[0] != null);
+    const lats = pts.map(p => p[0]), lons = pts.map(p => p[1]);
+    const pad = Math.max(.6, (Math.max(...lats) - Math.min(...lats)) * .5);
+    const bbox = [Math.min(...lats) - pad, Math.max(...lats) + pad, Math.min(...lons) - pad * 2.2, Math.max(...lons) + pad * 2.2];
+    const map = mapSVG({bbox, height: 300,
+      markers: [{lat: r.latitude, lon: r.longitude, shape: "tri", color: PCOL(r.priority), size: 9, label: r.site_name},
+                ...(r.worst_point_lat != null ? [{lat: r.worst_point_lat, lon: r.worst_point_lon, color: "var(--accent)", size: 6,
+                    label: `${num(r.field_strength_dbuv_m)} dBµV/m at ${r.worst_point_type}`}] : [])],
+      lines: r.worst_point_lat != null ? [{a: [r.latitude, r.longitude], b: [r.worst_point_lat, r.worst_point_lon], color: "var(--accent)"}] : [],
+      circles: r.radius_km ? [{lat: r.latitude, lon: r.longitude, km: r.radius_km, color: "var(--serious)"}] : []});
+    body = body.replace("<h3>Key figures</h3>", `<h3>Where</h3>${map}<div class="maplegend"><span>▲ transmitter</span><span><span style="color:var(--accent)">●</span> worst point on Finnish territory</span><span>- - path (${num(r.distance_km)} km: ${esc(r.path)})</span>${r.radius_km ? `<span>shaded: mobile service area (${num(r.radius_km,0)} km)</span>` : ""}</div><h3>Key figures</h3>`);
+  }
+  const nav = `<div class="navbar"><button data-nav="-1" title="Previous (←)" ${NAV.i <= 0 ? "disabled" : ""}>◀</button><span class="note">${NAV.i + 1} / ${NAV.rows.length}</span><button data-nav="1" title="Next (→)" ${NAV.i >= NAV.rows.length - 1 ? "disabled" : ""}>▶</button></div>`;
   history.replaceState(null, "", `#${k}/${r.notice_id}`);
-  $("#dhead").innerHTML = head; $("#dbody").innerHTML = body; $("#dbody").scrollTop = 0;
+  $("#dhead").innerHTML = head; $("#drawer .navbar")?.remove(); $("#close").insertAdjacentHTML("beforebegin", nav);
+  $$("#drawer [data-nav]").forEach(b => b.onclick = () => step(+b.dataset.nav)); $("#dbody").innerHTML = body; $("#dbody").scrollTop = 0;
   const d = $("#drawer"); d.classList.add("open"); d.setAttribute("aria-hidden", "false");
   const copy = $("[data-copy]", d), dl = $("[data-dl]", d), text = $("pre.letter", d)?.textContent;
   if (copy) copy.onclick = async () => { try { await navigator.clipboard.writeText(text); copy.textContent = "Copied"; } catch { const rng = document.createRange(); rng.selectNodeContents($("pre.letter", d)); getSelection().removeAllRanges(); getSelection().addRange(rng); copy.textContent = "Selected - press Ctrl+C"; } };
   if (dl) dl.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], {type:"text/plain"})); a.download = dl.dataset.dl.replace(/[^\w.-]+/g, "_") + ".txt"; a.click(); };
 }
 function closeDrawer(){ if (location.hash.includes("/")) history.replaceState(null, "", "#" + location.hash.slice(1).split("/")[0]); const d = $("#drawer"); d.classList.remove("open"); d.setAttribute("aria-hidden", "true"); }
-$("#close").onclick = closeDrawer; document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+function step(d) { if (!NAV) return; const i = NAV.i + d; if (i < 0 || i >= NAV.rows.length) return;
+  openDetail(NAV.k, NAV.rows[i], NAV.rows);
+  $$(`#t${NAV.k} tbody tr`).forEach(tr => tr.classList.toggle("sel", +tr.dataset.i === i && STATE[NAV.k].view === NAV.rows)); }
+$("#close").onclick = closeDrawer;
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeDrawer();
+  if (!$("#drawer").classList.contains("open") || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") { step(1); e.preventDefault(); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") { step(-1); e.preventDefault(); } });
 
 // ---------- deep links: #space, #terra/93082383 ----------
 (function route(){

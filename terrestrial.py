@@ -311,6 +311,14 @@ def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame,
     rows["result_class"] = cls
     rows["reason"] = [reason(r, min_exceedance_db, near_limit_db) for r in rows.itertuples()]
 
+    # Mobile (ML) records carry no site name: use the base-station name at the same location.
+    key = rows["lat_dec"].round(4).astype(str) + "," + rows["long_dec"].round(4).astype(str)
+    named = rows["site_name"].where(rows["site_name"].fillna("").str.strip() != "")
+    rows["site_name"] = named.fillna(key.map(named.groupby(key).first())).fillna("")
+    rows["site_name"] = [n if n else f"{c} {la:.2f} N {lo:.2f} E" for n, c, la, lo in
+                         zip(rows["site_name"], rows["stn_cls"], rows["lat_dec"], rows["long_dec"])]
+    rows["site_name"] = [f"{n} (mobile area)" if c == "ML" and "mobile" not in n else n
+                         for n, c in zip(rows["site_name"], rows["stn_cls"])]
     out = format_rows(rows, m4)
     alerts = prioritise_terrestrial(out[out["result_class"] == "EXCEEDS LIMIT"])
     concerns = out[out["result_class"].isin(["SUB_QA_EXCEEDANCE", "NEAR_LIMIT", "REVIEW:P1546_UNAVAILABLE"])]

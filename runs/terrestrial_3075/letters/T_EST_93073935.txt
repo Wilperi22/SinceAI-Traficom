@@ -4,7 +4,7 @@ From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of Estonia (Republic of) (EST)
 Date: 2026-11-07
 Subject: BR IFIC (Terrestrial Services) No. 3075 - land-mobile assignment 93073935
-         (None, 148.575 MHz): field strength at the Finnish border
+         (RANDVERE (mobile area), 148.575 MHz): field strength at the Finnish border
 
 Dear colleagues,
 
@@ -15,7 +15,7 @@ exceeds the coordination trigger of CEPT Recommendation T/R 25-08 (Annex 1, A1.2
 
 Technical summary
   Assignment:                 93073935 (adm. ref. EE160MLHAR003), 148.575 MHz, 16.0 kHz, F3E--
-  Transmitter site:           None, 59.5203 N 24.9017 E
+  Transmitter site:           RANDVERE (mobile area), 59.5203 N 24.9017 E
   e.r.p. / antenna height:    8.0 dBW / 2 m
   Worst point in Finland:     territorial sea, 59.8700 N 24.7700 E (14.6 km)
   Path:                       Cold 14.6 km
