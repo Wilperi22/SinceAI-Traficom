@@ -64,6 +64,8 @@ def open_db(path: Path) -> sqlite3.Connection:
 
 def overlaps_any(lo: np.ndarray, hi: np.ndarray, int_min: np.ndarray, int_max: np.ndarray) -> np.ndarray:
     """For each half-open [lo, hi): does any interval [int_min, int_max) overlap it? O(n log n), no n x m matrix."""
+    if len(int_min) == 0:  # no intervals at all (GitHub issue #12)
+        return np.zeros(len(lo), dtype=bool)
     order = np.argsort(int_min)
     mins, run_max = int_min[order], np.maximum.accumulate(int_max[order])
     idx = np.searchsorted(mins, hi, side="left")            # intervals starting before hi: [0, idx)

@@ -562,7 +562,13 @@ function render(k){
 }
 
 // ---------- detail drawer ----------
-const kv = pairs => `<dl class="kv">${pairs.filter(p => p[1] !== "" && p[1] !== null && p[1] !== undefined).map(([k,v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`;
+// Values are escaped by default (GitHub issue #11); intentional markup must be built with safe`...`,
+// which escapes every interpolated value that is not itself Safe.
+class Safe { constructor(s) { this.s = s; } toString() { return this.s; } }
+const safe = (strings, ...vals) => new Safe(strings.reduce((a, str, i) =>
+  a + str + (i < vals.length ? (vals[i] instanceof Safe ? vals[i].s : esc(vals[i])) : ""), ""));
+const kv = pairs => `<dl class="kv">${pairs.filter(p => p[1] !== "" && p[1] !== null && p[1] !== undefined)
+  .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v instanceof Safe ? v.s : esc(v)}</dd>`).join("")}</dl>`;
 function stationsBlock(ids){
   const list = (ids||"").split(";").filter(Boolean);
   if (!list.length) return `<span class="note">None of the Traficom special-interest stations overlap this frequency.</span>`;
@@ -581,19 +587,19 @@ function openDetail(k, r){
     head = `<h2>${esc(r.network_name)}</h2><div class="note">${esc(admName(r.country))} · notice ${esc(r.notice_id)}${r.related_notice_id ? ` (related ${esc(r.related_notice_id)})` : ""} · ${esc(r.notice_type)}</div><div style="margin-top:6px;display:flex;gap:14px">${badge(r.result_class)}${r.priority ? prioBadge(r.priority) + ` <span class="note">${esc(r.priority_reason)}</span>` : ""}</div>`;
     body = `<div class="why"><div class="big">${m === null || m === undefined ? "ITU Bureau finding - checked against Finland" : `${sgn(m)} dB ${m>=0 ? "over" : "under"} the ${r.result_class==="COORDINATION REQUIRED" ? "coordination threshold" : "limit"}`}</div><div style="margin-top:6px">${esc(r.reason)}</div></div>
       ${r.pfd_dbw_m2 === null || r.pfd_dbw_m2 === undefined ? "" : `<h3>Key figures</h3>${kv([
-        ["Calculated pfd", `${num(r.pfd_dbw_m2,2)} dB(W/m²) in ${esc(r.reference_bandwidth)}`],
-        ["Limit / threshold", `${num(r.pfd_limit_dbw_m2,2)} dB(W/m²) in ${esc(r.reference_bandwidth)}`],
-        ["Margin", `<b>${sgn(m,2)} dB</b>`],
+        ["Calculated pfd", `${num(r.pfd_dbw_m2,2)} dB(W/m²) in ${r.reference_bandwidth}`],
+        ["Limit / threshold", `${num(r.pfd_limit_dbw_m2,2)} dB(W/m²) in ${r.reference_bandwidth}`],
+        ["Margin", safe`<b>${sgn(m,2)} dB</b>`],
         ["e.i.r.p. in ref. bandwidth", `${num(r.eirp_ref_dbw,2)} dBW`],
-        ["Power source", esc(r.power_source)],
+        ["Power source", r.power_source],
         ["Worst-case geometry", `elevation ${num(r.elevation_deg)}°, slant range ${num(r.distance_km,0)} km`]])}`}
       <h3>Satellite</h3>${kv([
-        ["Network", esc(r.network_name)], ["Orbit", r.orbit === "GSO" ? `Geostationary, ${num(r.gso_longitude,2)}°` : `Non-geostationary${r.altitude_km ? `, altitude ${num(r.altitude_km,0)} km` : ""}`],
-        ["Assignment", `${esc(r.frequency_mhz)} MHz` + (r.beam_name ? `, beam ${esc(r.beam_name)}, emission ${esc(r.emission)}` : "")],
-        ["Station class / service", r.station_class ? `${esc(r.station_class)} / ${esc(r.service)}` : ""]])}
-      <h3>Regulation</h3>${kv([["Criterion", esc(r.rr_reference)], ["Register row", r.table21_4_row ? `<code>${esc(r.table21_4_row)}</code>` : ""],
-        ["ITU BR examination finding", r.br_finding ? esc(r.br_finding) + ` <span class="note">(A- favourable, N- unfavourable; X/21.16 = Bureau found the pfd limit exceeded)</span>` : `<span class="note">none recorded (API/A notices are not examined by the Bureau)</span>`]])}
-      <h3>Affected in Finland</h3>${kv([["M4 services in band", esc(r.m4_service) || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
+        ["Network", r.network_name], ["Orbit", r.orbit === "GSO" ? `Geostationary, ${num(r.gso_longitude,2)}°` : `Non-geostationary${r.altitude_km ? `, altitude ${num(r.altitude_km,0)} km` : ""}`],
+        ["Assignment", `${r.frequency_mhz} MHz` + (r.beam_name ? `, beam ${r.beam_name}, emission ${r.emission}` : "")],
+        ["Station class / service", r.station_class ? `${r.station_class} / ${r.service}` : ""]])}
+      <h3>Regulation</h3>${kv([["Criterion", r.rr_reference], ["Register row", r.table21_4_row ? safe`<code>${r.table21_4_row}</code>` : ""],
+        ["ITU BR examination finding", r.br_finding ? safe`${r.br_finding} <span class="note">(A- favourable, N- unfavourable; X/21.16 = Bureau found the pfd limit exceeded)</span>` : safe`<span class="note">none recorded (API/A notices are not examined by the Bureau)</span>`]])}
+      <h3>Affected in Finland</h3>${kv([["M4 services in band", r.m4_service || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
       <h3>Recommended letter</h3>${letterBlock("S:" + r.notice_id, `${r.country}_${r.notice_id}_${r.network_name}`)}`;
   } else {
     head = `<h2>${esc(r.site_name)}</h2><div class="note">${esc(admName(r.country))} · assignment ${esc(r.notice_id)} · class ${esc(r.station_class)} · ${esc(r.change_type)}</div><div style="margin-top:6px;display:flex;gap:14px">${badge(r.result_class)}${r.priority ? prioBadge(r.priority) + ` <span class="note">${esc(r.priority_reason)}</span>` : ""}</div>`;
@@ -601,15 +607,15 @@ function openDetail(k, r){
       ${r.coordination_with_fin ? `<div class="callout"><b>Coordination with Finland recorded in the ITU data:</b> ${esc(r.coordination_with_fin)}<br><span class="note">Verify against the Traficom frequency register - the case remains flagged.</span></div>` : ""}
       <h3>Key figures</h3>${kv([
         ["Field strength", `${num(r.field_strength_dbuv_m,2)} dB(µV/m)`], ["T/R 25-08 trigger", `${num(r.threshold_dbuv_m,2)} dB(µV/m)`],
-        ["Margin", `<b>${sgn(m,2)} dB</b>`], ["Worst point in Finland", `${esc(r.worst_point_type)} at ${num(r.worst_point_lat,4)} N ${num(r.worst_point_lon,4)} E`],
-        ["Distance / path", `${num(r.distance_km)} km - ${esc(r.path)}`], ["Model", esc(r.model)]])}
+        ["Margin", safe`<b>${sgn(m,2)} dB</b>`], ["Worst point in Finland", `${r.worst_point_type} at ${num(r.worst_point_lat,4)} N ${num(r.worst_point_lon,4)} E`],
+        ["Distance / path", `${num(r.distance_km)} km - ${r.path}`], ["Model", r.model]])}
       <h3>Transmitter</h3>${kv([
-        ["Site", `${esc(r.site_name)}, ${num(r.latitude,4)} N ${num(r.longitude,4)} E (${esc(r.geo_type)}${r.radius_km ? `, radius ${num(r.radius_km,0)} km` : ""})`],
-        ["Frequency / bandwidth", `${esc(r.frequency_mhz)} MHz / ${esc(r.bandwidth_khz)} kHz, ${esc(r.emission)}`],
-        ["e.r.p. / antenna height", `${num(r.erp_dbw)} dBW / ${num(r.tx_height_m,0)} m`], ["ITU remarks", esc(r.itu_remarks)]])}
-      <h3>Compared with earlier IFIC issues</h3>${kv([["Status", esc(r.change_vs_previous_issues || "-")],
-        ["Earlier publications", esc(r.issue_history) || "<span class=\"note\">none in the processed issues</span>"]])}
-      <h3>Affected in Finland</h3>${kv([["M4 services at this frequency", esc(r.m4_service) || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
+        ["Site", `${r.site_name}, ${num(r.latitude,4)} N ${num(r.longitude,4)} E (${r.geo_type}${r.radius_km ? `, radius ${num(r.radius_km,0)} km` : ""})`],
+        ["Frequency / bandwidth", `${r.frequency_mhz} MHz / ${r.bandwidth_khz} kHz, ${r.emission}`],
+        ["e.r.p. / antenna height", `${num(r.erp_dbw)} dBW / ${num(r.tx_height_m,0)} m`], ["ITU remarks", r.itu_remarks]])}
+      <h3>Compared with earlier IFIC issues</h3>${kv([["Status", r.change_vs_previous_issues || "-"],
+        ["Earlier publications", r.issue_history || safe`<span class="note">none in the processed issues</span>`]])}
+      <h3>Affected in Finland</h3>${kv([["M4 services at this frequency", r.m4_service || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
       <h3>Recommended letter</h3>${letterBlock("T:" + r.notice_id, `T_${r.country}_${r.notice_id}`)}`;
   }
   history.replaceState(null, "", `#${k}/${r.notice_id}`);

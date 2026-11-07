@@ -99,6 +99,8 @@ class SpacePhysics(unittest.TestCase):
         brute = ((a[None, :] < hi[:, None]) & (b[None, :] > lo[:, None])).any(axis=1)
         self.assertTrue((ie.overlaps_any(lo, hi, a, b) == brute).all())
         self.assertFalse(ie.overlaps_any(np.array([10.0]), np.array([20.0]), np.array([20.0]), np.array([30.0]))[0])  # touching
+        self.assertEqual(list(ie.overlaps_any(np.array([10.0, 5.0]), np.array([20.0, 6.0]), np.array([]), np.array([]))),
+                         [False, False])  # issue #12: no intervals
 
     def test_terrestrial_m4_excludes_satellite_services(self):
         """GitHub issue #1: 'MOBILE-SATELLITE' etc. must not count as terrestrial Finnish use."""
