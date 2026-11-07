@@ -496,5 +496,14 @@ def main() -> None:
         run_once(cfg)
 
 
+def use_project_venv() -> None:
+    """Re-run this script with the project's .venv interpreter if started with another Python
+    (e.g. a plain 'python3'), so the ITU-R P.1546 library and pinned packages are always used."""
+    venv_python = Path(__file__).resolve().parent / ".venv" / "bin" / "python"
+    if venv_python.exists() and Path(sys.prefix).resolve() != venv_python.parent.parent.resolve():
+        os.execv(str(venv_python), [str(venv_python), *sys.argv])
+
+
 if __name__ == "__main__":
+    use_project_venv()
     main()
