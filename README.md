@@ -152,6 +152,11 @@ are available.)
 
 36 tests: physics against reference values, independent hand calculations of real findings, RR footnote
 rules, ITU Bureau cross-check, the letter AI's number check, pipeline I/O, and invariants on the outputs.
+Five tests recompute findings from the raw IFIC 3074 database, which is not in git (286 MB): on a fresh
+clone they are skipped until `.venv/bin/python pipeline.py s3074` has downloaded it.
+
+Fresh-clone check: `pipeline.py s3074 t3076` downloads both evaluation issues from the ITU, converts
+5.2 million rows with verified counts and reproduces the submitted results in about one minute.
 
 ## Files
 

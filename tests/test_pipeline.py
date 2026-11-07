@@ -28,8 +28,16 @@ sys.path.insert(0, str(ROOT))
 import inspection_engine as ie  # noqa: E402
 import terrestrial as tr  # noqa: E402
 
-SPACE_DB = ROOT / "ific3074.sqlite"
-TERRA_DB = ROOT / "brific3076.sqlite"
+def _find_db(stem: str) -> Path | None:
+    """IFIC databases are not in git: look where convert_mdb.py / pipeline.py put them."""
+    for candidate in [ROOT / f"{stem}.sqlite", *sorted((ROOT / "data" / "sqlite").glob(f"{stem}_*.sqlite"))]:
+        if candidate.is_file() and candidate.stat().st_size > 0:
+            return candidate
+    return None
+
+
+SPACE_DB = _find_db("ific3074")
+NEED_SPACE_DB = "IFIC 3074 database not present (not in git): run '.venv/bin/python pipeline.py s3074' first"
 SPACE_RUN = ROOT / "runs" / "space_3074"          # written by pipeline.py
 TERRA_RUN = ROOT / "runs" / "terrestrial_3076"
 SPACE_REPORT = SPACE_RUN / "alerts.csv"
@@ -129,6 +137,7 @@ class SpaceFindings(unittest.TestCase):
     def setUpClass(cls):
         cls.report = pd.read_csv(SPACE_REPORT)
 
+    @unittest.skipIf(SPACE_DB is None, NEED_SPACE_DB)
     def test_hand_calculation_csn_sso(self):
         """Recompute CSN-SSO (124545403) from raw IFIC rows, independent of the engine."""
         row = self.report.set_index("notice_id").loc[124545403]
@@ -149,6 +158,7 @@ class SpaceFindings(unittest.TestCase):
         self.assertAlmostEqual(row["pfd_limit_dbw_m2"], -138.0, delta=0.05)
         self.assertAlmostEqual(row["margin_of_exceedance"], pfd + 138.0, delta=0.05)
 
+    @unittest.skipIf(SPACE_DB is None, NEED_SPACE_DB)
     def test_notified_eirp_not_double_counted(self):
         """s_beam.pwr_max_4k equals pwr_ds_max + 36 dB + gain, i.e. it is already e.i.r.p."""
         with sqlite3.connect(SPACE_DB) as con:
@@ -169,6 +179,7 @@ class SpaceFindings(unittest.TestCase):
                     }
         self.assertFalse(excluded & set(self.report["notice_id"]))
 
+    @unittest.skipIf(SPACE_DB is None, NEED_SPACE_DB)
     def test_rr_footnote_11_large_constellations(self):
         """RR 21.16.4: 37.5-42.5 GHz NGSO limits only for systems of <= 99 satellites."""
         concerns = pd.read_csv(SPACE_CONCERNS).set_index("notice_id")
@@ -180,6 +191,7 @@ class SpaceFindings(unittest.TestCase):
                 n = con.execute("SELECT SUM(nbr_sat_pl) FROM orbit WHERE ntc_id = ?", (int(ntc),)).fetchone()[0]
                 self.assertLessEqual(n or 0, 99, ntc)
 
+    @unittest.skipIf(SPACE_DB is None, NEED_SPACE_DB)
     def test_rr_footnote_18_sar_mean_pfd(self):
         """RR 21.16.8: PAZ_2-A EESS (active) uses mean power = pep x tau x PRF over Bc."""
         row = self.report.set_index("notice_id").loc[124520174]
@@ -200,6 +212,7 @@ class SpaceFindings(unittest.TestCase):
         lvi = allrows[allrows["notice_id"] == 126545057]
         self.assertTrue((lvi["calculated_power_dbw"] < 0).all())
 
+    @unittest.skipIf(SPACE_DB is None, NEED_SPACE_DB)
     def test_itu_bureau_findings_cross_check(self):
         """Every network the BR found unfavourable under 21.16 is either an alert or explained as a concern."""
         with sqlite3.connect(SPACE_DB) as con:
