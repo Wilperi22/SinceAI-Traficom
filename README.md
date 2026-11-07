@@ -43,20 +43,34 @@ Located in `Traficom materials/`:
 
 ## Data Pipeline (`process_itu_mdb.py`)
 
-Single script that handles both conversion and view creation:
+Single script that handles download, conversion, and view creation:
 
 ```bash
-# Using defaults (ific3074.mdb in ~/Downloads, output to project dir)
+# Auto-download IFIC #3074 from ITU (default)
 python process_itu_mdb.py
 
-# Custom input/output
-python process_itu_mdb.py /path/to/ific3083.mdb /path/to/output_dir
+# Download specific IFIC by number
+python process_itu_mdb.py 3083
 
-# Only custom input (output dir uses default)
+# Download from custom ITU zip URL
+python process_itu_mdb.py https://www.itu.int/sns/ific10/ific3083.zip
+
+# Use local .mdb file
 python process_itu_mdb.py /path/to/ific3083.mdb
+
+# Use local .zip file
+python process_itu_mdb.py /path/to/ific3083.zip
+
+# Custom output directory
+python process_itu_mdb.py 3083 /path/to/output_dir
 ```
 
 ### What it does:
+
+0. **Downloads & extracts** (if input is IFIC number, URL, or .zip)
+   - Fetches `https://www.itu.int/sns/ific10/ific<NUM>.zip`
+   - Extracts `.mdb` to temporary directory
+   - Cleans up temp files automatically
 
 1. **Converts MDB → SQLite** using `mdb-tools` (`mdb-tables`, `mdb-schema`, `mdb-export`)
    - Output filename derived from input (e.g., `ific3083.mdb` → `ific3083.sqlite`)
@@ -92,17 +106,15 @@ Complete DDL export including all tables and indexes. Key tables:
 # 1. Install mdb-tools (Ubuntu/Debian)
 sudo apt-get install mdb-tools
 
-# 2. Download IFIC MDB from ITU BR (e.g., place in ~/Downloads/ific3074.mdb)
-
-# 3. Run unified processing script
+# 2. Run unified processing script (auto-downloads IFIC #3074 from ITU)
 python process_itu_mdb.py
 ```
 
-**Default paths:**
-- Input: `/home/niksu/Downloads/ific3074.mdb`
+**Default behavior:**
+- Input: IFIC #3074 (auto-downloaded from `https://www.itu.int/sns/ific10/ific3074.zip`)
 - Output: `/home/niksu/Documents/SinceAI-Traficom/ific3074.sqlite`
 
-Override by passing arguments: `python process_itu_mdb.py <input.mdb> [output_dir]`
+**Override input:** `python process_itu_mdb.py <IFIC_NUM|URL|.mdb|.zip> [output_dir]`
 
 ---
 

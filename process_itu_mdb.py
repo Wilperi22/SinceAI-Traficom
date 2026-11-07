@@ -3,10 +3,15 @@
 Process ITU BR IFIC MDB file: convert to SQLite and create analytical views.
 
 Usage:
-    python process_itu_mdb.py [INPUT_MDB] [OUTPUT_DIR]
+    python process_itu_mdb.py [INPUT] [OUTPUT_DIR]
+
+INPUT can be:
+    - Path to local .mdb file
+    - IFIC number (e.g., 3074) → downloads from https://www.itu.int/sns/ific10/ific3074.zip
+    - Full ITU zip URL
 
 If no arguments provided, uses defaults:
-    INPUT_MDB:  /home/niksu/Downloads/ific3074.mdb
+    INPUT:      3074 (downloads ific3074.zip from ITU)
     OUTPUT_DIR: /home/niksu/Documents/SinceAI-Traficom
 """
 
@@ -15,28 +20,108 @@ import sys
 import subprocess
 import sqlite3
 import re
+import urllib.request
+import zipfile
+import tempfile
+import shutil
+
+
+ITU_BASE_URL = "https://www.itu.int/sns/ific10/ific{num}.zip"
 
 
 def parse_args():
     """Parse command-line arguments with defaults."""
-    default_mdb = "/home/niksu/Downloads/ific3074.mdb"
+    default_input = "3074"  # IFIC number -> auto-download
     default_out = "/home/niksu/Documents/SinceAI-Traficom"
 
     if len(sys.argv) >= 2:
-        mdb_path = sys.argv[1]
+        input_arg = sys.argv[1]
     else:
-        mdb_path = default_mdb
+        input_arg = default_input
 
     if len(sys.argv) >= 3:
         output_dir = sys.argv[2]
     else:
         output_dir = default_out
 
-    # Derive output SQLite filename from input MDB basename
-    mdb_basename = os.path.splitext(os.path.basename(mdb_path))[0]
-    output_db = os.path.join(output_dir, f"{mdb_basename}.sqlite")
+    return input_arg, output_dir
 
-    return mdb_path, output_dir, output_db, mdb_basename
+
+def resolve_input(input_arg, work_dir):
+    """
+    Resolve input argument to a local MDB path.
+    Returns (mdb_path, ific_number, mdb_basename)
+    """
+    # Case 1: It's a URL
+    if input_arg.startswith("http://") or input_arg.startswith("https://"):
+        return download_and_extract(input_arg, work_dir)
+
+    # Case 2: It's a local .mdb file
+    if input_arg.endswith(".mdb") and os.path.exists(input_arg):
+        mdb_basename = os.path.splitext(os.path.basename(input_arg))[0]
+        match = re.search(r"(\d+)", mdb_basename)
+        ific_number = int(match.group(1)) if match else 0
+        return input_arg, ific_number, mdb_basename
+
+    # Case 3: It's an IFIC number (digits only)
+    if input_arg.isdigit():
+        ific_number = int(input_arg)
+        url = ITU_BASE_URL.format(num=ific_number)
+        return download_and_extract(url, work_dir)
+
+    # Case 4: It's a local .zip file
+    if input_arg.endswith(".zip") and os.path.exists(input_arg):
+        return extract_zip(input_arg, work_dir)
+
+    print(f"ERROR: Cannot resolve input: {input_arg}")
+    print("  Expected: local .mdb path, IFIC number (e.g., 3074), ITU zip URL, or local .zip path")
+    sys.exit(1)
+
+
+def download_and_extract(url, work_dir):
+    """Download zip from URL and extract MDB. Returns (mdb_path, ific_number, mdb_basename)."""
+    print(f"Downloading: {url}")
+    zip_path = os.path.join(work_dir, os.path.basename(url))
+
+    try:
+        urllib.request.urlretrieve(url, zip_path)
+        print(f"  Downloaded to: {zip_path}")
+    except urllib.error.HTTPError as e:
+        print(f"ERROR: Failed to download (HTTP {e.code}): {url}")
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"ERROR: Network error: {e}")
+        sys.exit(1)
+
+    return extract_zip(zip_path, work_dir)
+
+
+def extract_zip(zip_path, work_dir):
+    """Extract MDB from zip file. Returns (mdb_path, ific_number, mdb_basename)."""
+    print(f"Extracting: {zip_path}")
+    mdb_files = []
+
+    with zipfile.ZipFile(zip_path, 'r') as zf:
+        # Find .mdb files in zip
+        for name in zf.namelist():
+            if name.lower().endswith(".mdb"):
+                mdb_files.append(name)
+
+        if not mdb_files:
+            print("ERROR: No .mdb file found in zip")
+            sys.exit(1)
+
+        # Extract the first (or only) .mdb file
+        mdb_name = mdb_files[0]
+        zf.extract(mdb_name, work_dir)
+        mdb_path = os.path.join(work_dir, mdb_name)
+        print(f"  Extracted: {mdb_path}")
+
+    mdb_basename = os.path.splitext(os.path.basename(mdb_path))[0]
+    match = re.search(r"(\d+)", mdb_basename)
+    ific_number = int(match.group(1)) if match else 0
+
+    return mdb_path, ific_number, mdb_basename
 
 
 def convert_mdb_to_sqlite(mdb_path, output_db):
@@ -83,7 +168,9 @@ def convert_mdb_to_sqlite(mdb_path, output_db):
                     try:
                         cur.execute(stmt + ";")
                     except Exception as inner_e:
-                        print(f"    Ignored Schema error on: {stmt[:60]}... -> {inner_e}")
+                        print(
+                            f"    Ignored Schema error on: {stmt[:60]}... -> {inner_e}"
+                        )
             conn.commit()
     else:
         print("  Warning: No schema output received from mdb-schema.")
@@ -159,36 +246,40 @@ WHERE n.wic_no = {ific_number}
 
 
 def main():
-    mdb_path, output_dir, output_db, mdb_basename = parse_args()
+    input_arg, output_dir = parse_args()
 
-    # Extract IFIC number from filename (e.g., "ific3074" -> 3074)
-    match = re.search(r'(\d+)', mdb_basename)
-    ific_number = int(match.group(1)) if match else 3074
+    # Create temp directory for downloads/extractions
+    with tempfile.TemporaryDirectory(prefix="ific_") as work_dir:
+        mdb_path, ific_number, mdb_basename = resolve_input(input_arg, work_dir)
 
-    print(f"Input MDB:  {mdb_path}")
-    print(f"Output DB:  {output_db}")
-    print(f"IFIC number: {ific_number}")
-    print(f"Output dir: {output_dir}")
+        # Derive output SQLite filename from input MDB basename
+        output_db = os.path.join(output_dir, f"{mdb_basename}.sqlite")
 
-    if not os.path.exists(mdb_path):
-        print(f"ERROR: MDB file not found: {mdb_path}")
-        sys.exit(1)
+        print(f"Input MDB:  {mdb_path}")
+        print(f"Output DB:  {output_db}")
+        print(f"IFIC number: {ific_number}")
+        print(f"Output dir: {output_dir}")
 
-    # Step 1: Convert MDB to SQLite
-    conn, tables = convert_mdb_to_sqlite(mdb_path, output_db)
+        if not os.path.exists(mdb_path):
+            print(f"ERROR: MDB file not found: {mdb_path}")
+            sys.exit(1)
 
-    # Step 2: Create analytical view (only for IFIC 3074 or if tables look like Space IFIC)
-    # Check if required tables exist
-    required_tables = {'notice', 'grp', 'freq', 'emiss', 's_beam', 'geo', 'tr_aff_ntw'}
-    if required_tables.issubset(set(tables)):
-        create_space_ific_view(conn, ific_number)
-    else:
-        print("\nRequired tables for Space IFIC view not found; skipping view creation.")
-        print(f"Available tables: {', '.join(sorted(tables))}")
+        # Step 1: Convert MDB to SQLite
+        conn, tables = convert_mdb_to_sqlite(mdb_path, output_db)
 
-    # Close connection
-    conn.close()
-    print(f"\nProcessing finished successfully: {output_db}")
+        # Step 2: Create analytical view (only if tables look like Space IFIC)
+        required_tables = {"notice", "grp", "freq", "emiss", "s_beam", "geo", "tr_aff_ntw"}
+        if required_tables.issubset(set(tables)):
+            create_space_ific_view(conn, ific_number)
+        else:
+            print(
+                "\nRequired tables for Space IFIC view not found; skipping view creation."
+            )
+            print(f"Available tables: {', '.join(sorted(tables))}")
+
+        # Close connection
+        conn.close()
+        print(f"\nProcessing finished successfully: {output_db}")
 
 
 if __name__ == "__main__":
