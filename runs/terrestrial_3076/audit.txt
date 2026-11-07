@@ -2,7 +2,7 @@ TERRESTRIAL IFIC 3076 - pipeline run
 Source: brific3076.mdb (sha256 7358853076caab70e2a18c1d86cc1d22be40a28d0a17202aa6ad35729fce234d)
 Database: data/sqlite/brific3076_7358853076ca.sqlite
 Criterion: ECC T/R 25-08 A1.2.3, 20 dB(uV/m) in 25 kHz; P.1546-6 10% time; alert gate 0 dB
-Run (UTC): 2026-11-07T17:35:22+00:00
+Run (UTC): 2026-11-07T17:42:41+00:00
 Input brific3076_7358853076ca.sqlite: sha256 a787ffe7a8ca76cd71c8faed49e31b558e3a9226d82793ae866f8e79af54aa8b (12337152 bytes)
 Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
 Input Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx: sha256 bb7f481f085fb6c457efc04b9b6bb8250c42ea81bab4b4a0e518c93834e03c8a (100809 bytes)
@@ -41,4 +41,4 @@ REVIEW:P1546_INPUT_MISSING (not exported): 0 records without e.r.p. or antenna h
 Out of P.1546 range (> 1000 km from Finland): 1801 records (SVN: 1127, KAZ: 412, CHN: 194, RUS: 66, F: 2)
 Evaluated with ITU-R P.1546-6 (Py1546 reference implementation): 57 records from POL, RUS
 Alerts (margin >= 0 dB): 6; concerns: 2 (NEAR_LIMIT: 2)
-Exported 6 alerts and 2 concerns in 3.2 s
+Exported 6 alerts and 2 concerns in 3.1 s

@@ -29,6 +29,8 @@
   "coordination_with_fin":"COORD COMPLETED (RR6.7, 2026-06-26)",
   "itu_remarks":"t_elev=-7",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"39.3 dB(uV\/m) at land border (14 km, Land 14.3 km) vs T\/R 25-08 A1.2.3 trigger 43.0 dB(uV\/m): 3.8 dB below the trigger (near-limit margin 6 dB); ITU records coordination with Finland: COORD COMPLETED (RR6.7, 2026-06-26) - verify against the Traficom frequency register"
  },
  {
@@ -61,6 +63,8 @@
   "coordination_with_fin":"",
   "itu_remarks":"",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"15.0 dB(uV\/m) at territorial sea (103 km, Land 26.1 km + Cold 77.2 km) vs T\/R 25-08 A1.2.3 trigger 20.0 dB(uV\/m): 5.0 dB below the trigger (near-limit margin 6 dB)"
  }
 ]

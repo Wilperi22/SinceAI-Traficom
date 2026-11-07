@@ -208,6 +208,18 @@ class SpaceFindings(unittest.TestCase):
         self.assertTrue(x <= covered, x - covered)
         self.assertIn("X/21.16", self.report.set_index("notice_id").loc[124520184, "br_finding"])  # CHINASAT-G agrees
 
+    def test_priority_rules_and_workbook(self):
+        r = self.report
+        self.assertTrue(r["priority"].isin(["High", "Medium", "Low"]).all())
+        rank = r["priority"].map({"High": 0, "Medium": 1, "Low": 2})
+        self.assertTrue(rank.is_monotonic_increasing, "alerts must be sorted by priority")
+        self.assertTrue((r.loc[r["margin_of_exceedance"] >= 10, "priority"] == "High").all())
+        low = r[r["priority"] == "Low"]
+        self.assertTrue((low["margin_of_exceedance"] < 3).all() and low["finnish_station_id"].isna().all())
+        book = pd.read_excel(SPACE_RUN / "space_3074_results.xlsx", sheet_name=None)
+        self.assertEqual(list(book), ["Summary", "Alerts", "Concerns", "Method"])
+        self.assertEqual(len(book["Alerts"]), len(r))
+
     def test_report_invariants(self):
         r = self.report
         self.assertTrue((r["margin_of_exceedance"] >= ie.MIN_EXCEEDANCE_MARGIN_DB).all())

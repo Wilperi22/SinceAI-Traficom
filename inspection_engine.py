@@ -32,7 +32,8 @@ OUTPUT_COLUMNS = [
     "gso_longitude", "altitude_km", "frequency_mhz", "beam_name", "station_class", "service",
     "emission", "power_source", "calculated_power_dbw", "eirp_ref_dbw", "elevation_deg", "distance_km",
     "pfd_dbw_m2", "pfd_limit_dbw_m2", "margin_of_exceedance", "reference_bandwidth",
-    "table21_4_row", "rr_reference", "br_finding", "finnish_station_id", "m4_service", "result_class", "reason",
+    "table21_4_row", "rr_reference", "br_finding", "finnish_station_id", "m4_service", "result_class",
+    "priority", "priority_reason", "reason",
 ]
 CONCERN_COLUMNS = OUTPUT_COLUMNS + ["concern_types"]
 
@@ -575,7 +576,36 @@ def space_report(database: Path, limits: pd.DataFrame, m4: pd.DataFrame, station
          f"{len(set(x2116['ntc_id']) & flagged)}; listed as BR_UNFAVOURABLE_21_16 concerns: {len(extra)}")
     note(f"Concerns (separate CSV, networks without an alert): {len(concerns)} - "
          + ", ".join(f"{c}: {int((concerns['result_class'] == c).sum())}" for c in CONCERN_PRIORITY))
+    alerts = prioritise_space(alerts)
+    note("Alert priority: " + ", ".join(f"{p}: {int((alerts['priority'] == p).sum())}" for p in PRIORITIES))
     return alerts, concerns
+
+
+PRIORITIES = ["High", "Medium", "Low"]
+
+
+def prioritise_space(alerts: pd.DataFrame) -> pd.DataFrame:
+    """Deterministic review priority for space alerts (documented in README and report).
+
+    High:   margin >= 10 dB, or the ITU BR itself found No. 21.16 exceeded (X/21.16),
+            or Finnish special-interest stations use the band and margin >= 3 dB.
+    Medium: margin >= 3 dB, or Finnish stations use the band, or RR No. 9.14 coordination required.
+    Low:    everything else (0-3 dB, no Finnish station in the band).
+    """
+    alerts = alerts.copy()
+    margin = pd.to_numeric(alerts["margin_of_exceedance"], errors="coerce").fillna(0)
+    br = alerts["br_finding"].fillna("").astype(str).str.contains("X/21.16", regex=False)
+    stations = alerts["finnish_station_id"].fillna("").astype(str).str.len() > 0
+    coord = alerts["result_class"].eq("COORDINATION REQUIRED")
+    high = (margin >= 10) | br | (stations & (margin >= 3))
+    medium = ~high & ((margin >= 3) | stations | coord)
+    alerts["priority"] = np.select([high, medium], ["High", "Medium"], default="Low")
+    alerts["priority_reason"] = [
+        "; ".join(t for t, on in ((f"{m:+.1f} dB", True), ("ITU BR finding X/21.16", b),
+                                  ("Finnish stations in band", s), ("RR 9.14 coordination", c)) if on)
+        for m, b, s, c in zip(margin, br, stations, coord)]
+    rank = alerts["priority"].map(PRIORITIES.index)
+    return alerts.assign(_r=rank).sort_values(["_r", "margin_of_exceedance"], ascending=[True, False]).drop(columns="_r")
 
 
 def _br_text(g: pd.DataFrame) -> str:

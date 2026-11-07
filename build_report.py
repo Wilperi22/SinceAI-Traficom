@@ -322,6 +322,7 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
       <li><b>Alerts</b> are cases where a calculated value exceeds a cited regulatory limit: <span class="badge"><i style="background:var(--critical)"></i>Exceeds limit</span> (RR Table 21-4 hard limit, or T/R 25-08 trigger for terrestrial) or <span class="badge"><i style="background:var(--serious)"></i>Coordination required</span> (RR No. 9.14, Appendix 5 threshold).</li>
       <li><b>Concerns</b> are documented screening cases below alert level (near the limit, limit not applicable, worst-case inter-satellite beams, high pfd in bands without a limit). Margins are adjustable on the command line.</li>
       <li>Click any row to see <b>why</b> it was flagged, the figures, the regulation, affected Finnish services and stations, and the <b>recommended letter</b> to the administration.</li>
+      <li><b>Priority</b> orders alerts for review: <span style="color:var(--critical)">▲</span> High (space: ≥10 dB, ITU BR finding X/21.16, or Finnish stations in band and ≥3 dB; terrestrial: ≥6 dB or a Finnish station above the trigger), <span style="color:var(--serious)">●</span> Medium, <span style="color:var(--ink-3)">○</span> Low (small margins, within modelling uncertainty for terrestrial &lt;1 dB).</li>
       <li>All calculations are worst case as instructed by Traficom (peak gain toward Finland; maximum e.r.p. toward the border).</li>
     </ul>
   </div>
@@ -333,6 +334,7 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
     <input type="search" placeholder="Search network, notice, administration, band..." data-search="space">
     <select data-adm="space"><option value="">All administrations</option></select>
     <select data-cls="space"><option value="">All result classes</option></select>
+    <select data-prio="space"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
     <span class="slide"><button data-slide="space" data-d="-1" title="Scroll table left">&#9664;</button><button data-slide="space" data-d="1" title="Scroll table right">&#9654;</button></span>
     <span class="note" data-count="space"></span>
   </div>
@@ -345,6 +347,7 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
     <input type="search" placeholder="Search site, notice, administration..." data-search="terra">
     <select data-adm="terra"><option value="">All administrations</option></select>
     <select data-cls="terra"><option value="">All result classes</option></select>
+    <select data-prio="terra"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
     <span class="slide"><button data-slide="terra" data-d="-1" title="Scroll table left">&#9664;</button><button data-slide="terra" data-d="1" title="Scroll table right">&#9654;</button></span>
     <span class="note" data-count="terra"></span>
   </div>
@@ -408,7 +411,7 @@ code{font:12px ui-monospace,Menlo,monospace;background:var(--surface-2);padding:
 .venv/bin/python -m unittest tests.test_pipeline
 .venv/bin/python build_report.py          # this page</pre>
       <h3>Output files</h3>
-      <p class="note">space_3074_report.csv/.json (alerts), space_3074_concerns.csv/.json, terrestrial_3076_report.csv/.json, terrestrial_3076_concerns.csv/.json, *_audit.txt, letters/*.txt</p>
+      <p class="note">Per issue in runs/&lt;kind&gt;_&lt;ific&gt;/: <b>&lt;kind&gt;_&lt;ific&gt;_results.xlsx</b> (Summary, Alerts, Concerns, Method), alerts.csv/.json, concerns.csv/.json, audit.txt, letters/*.txt. All issues: results.sqlite.</p>
     </div>
   </div>
   <div class="card" style="margin-top:16px"><h3 style="margin-top:0">Space audit trail</h3><pre class="letter" id="auditS"></pre></div>
@@ -438,6 +441,9 @@ const CLASS = {
   "NEAR_LIMIT": ["var(--neutral)", "Near limit"],
   "REVIEW:P1546_UNAVAILABLE": ["var(--neutral)", "Review"],
 };
+const PRIO = {High: ["▲", "var(--critical)"], Medium: ["●", "var(--serious)"], Low: ["○", "var(--ink-3)"]};
+const prioRank = r => ({High: 0, Medium: 1, Low: 2}[r.priority] ?? 3);
+const prioBadge = p => p ? `<span class="badge"><span style="color:${PRIO[p][1]}">${PRIO[p][0]}</span>${esc(p)}</span>` : `<span class="note">-</span>`;
 const badge = c => { const [col, lab] = CLASS[c] || ["var(--neutral)", c]; return `<span class="badge"><i style="background:${col}"></i>${esc(lab)}</span>`; };
 
 // ---------- issue selection (?space=3074&terra=3076, default latest) ----------
@@ -470,9 +476,9 @@ $$("nav button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 // ---------- overview ----------
 const count = (rows, c) => rows.filter(r => r.result_class === c).length;
 const tiles = [
-  {k:`Space ${D.spaceIfic} alerts`, v:D.space.alerts.length, d:`${count(D.space.alerts,"CRITICAL ERROR")} exceed Table 21-4 · ${count(D.space.alerts,"COORDINATION REQUIRED")} need coordination (RR 9.14)`, go:["space","alerts"]},
+  {k:`Space ${D.spaceIfic} alerts`, v:D.space.alerts.length, d:`${D.space.alerts.filter(r => r.priority === "High").length} high priority · ${count(D.space.alerts,"CRITICAL ERROR")} exceed Table 21-4 · ${count(D.space.alerts,"COORDINATION REQUIRED")} need coordination (RR 9.14)`, go:["space","alerts"]},
   {k:`Space ${D.spaceIfic} concerns`, v:D.space.concerns.length, d:"near limit, limit not applicable, worst-case", go:["space","concerns"]},
-  {k:`Terrestrial ${D.terraIfic} alerts`, v:D.terra.alerts.length, d:"exceed T/R 25-08 trigger at the Finnish border", go:["terra","alerts"]},
+  {k:`Terrestrial ${D.terraIfic} alerts`, v:D.terra.alerts.length, d:`${D.terra.alerts.filter(r => r.priority === "High").length} high priority · exceed T/R 25-08 trigger at the Finnish border`, go:["terra","alerts"]},
   {k:`Terrestrial ${D.terraIfic} concerns`, v:D.terra.concerns.length, d:"within the near-limit margin", go:["terra","concerns"]},
 ];
 $("#tiles").innerHTML = tiles.map((t,i) => `<div class="tile" data-i="${i}" role="button" tabindex="0"><div class="k">${esc(t.k)}</div><div class="v">${t.v}</div><div class="d">${esc(t.d)}</div></div>`).join("");
@@ -491,7 +497,7 @@ $$("#admchart .row").forEach(el => { el.onmousemove = e => tip(e, el.dataset.tip
   el.onclick = () => { const c = admRows[$$("#admchart .row").indexOf(el)][0]; const tab = adm[c].s ? "space" : "terra"; showTab(tab); $(`[data-adm=${tab}]`).value = c; setMode(tab, "alerts"); }; });
 
 const topRows = [...D.space.alerts.map(r => ({r, k:"space", m:r.margin_of_exceedance, name:r.network_name})),
-             ...D.terra.alerts.map(r => ({r, k:"terra", m:r.margin_db, name:r.site_name}))].sort((a,b) => b.m-a.m).slice(0,8);
+             ...D.terra.alerts.map(r => ({r, k:"terra", m:r.margin_db, name:r.site_name}))].sort((a,b) => prioRank(a.r) - prioRank(b.r) || b.m-a.m).slice(0,8);
 $("#top").innerHTML = `<table class="plain"><tbody>${topRows.map((x,i) => `<tr data-i="${i}" style="cursor:pointer"><td><b>${esc(x.name)}</b><div class="note">${esc(admName(x.r.country))} · ${x.k === "space" ? "Space" : "Terrestrial"} · ${esc(x.r.frequency_mhz)} MHz</div></td><td>${badge(x.r.result_class)}</td><td class="num"><b>${sgn(x.m)} dB</b></td></tr>`).join("")}</tbody></table>`;
 $$("#top tr").forEach(el => el.onclick = () => { const x = topRows[el.dataset.i]; openDetail(x.k, x.r); });
 
@@ -507,13 +513,13 @@ $$("[data-slide]").forEach(b => b.onclick = () => $(`#t${b.dataset.slide}`).pare
 // ---------- tables ----------
 const COLS = {
   space: [
-    ["#", r => r._rank, "num"], ["Network", r => r.network_name, "name"], ["Admin.", r => r.country], ["Notice", r => r.notice_id],
+    ["#", r => r._rank, "num"], ["Network", r => r.network_name, "name"], ["Priority", r => r.priority, "prio", prioRank], ["Admin.", r => r.country], ["Notice", r => r.notice_id],
     ["Type", r => r.notice_type], ["Orbit", r => r.orbit === "GSO" ? `GSO ${num(r.gso_longitude)}°` : `NGSO ${num(r.altitude_km,0)} km`],
     ["Band (MHz)", r => r.frequency_mhz], ["Service", r => r.service], ["Result", r => r.result_class, "badge"],
     ["Margin (dB)", r => r.margin_of_exceedance, "margin"], ["FI stations", r => (r.finnish_station_id||"").split(";").filter(Boolean).length, "num"],
   ],
   terra: [
-    ["#", r => r._rank, "num"], ["Site", r => r.site_name, "name"], ["Admin.", r => r.country], ["Notice", r => r.notice_id],
+    ["#", r => r._rank, "num"], ["Site", r => r.site_name, "name"], ["Priority", r => r.priority, "prio", prioRank], ["Admin.", r => r.country], ["Notice", r => r.notice_id],
     ["Class", r => r.station_class], ["Change", r => r.change_type], ["Freq (MHz)", r => r.frequency_mhz, "num"],
     ["Distance (km)", r => r.distance_km, "num"], ["Field (dBµV/m)", r => r.field_strength_dbuv_m, "num1"], ["Result", r => r.result_class, "badge"],
     ["Margin (dB)", r => r.margin_db, "margin"], ["Coordinated w/ FIN", r => r.coordination_with_fin ? "recorded" : ""],
@@ -525,22 +531,23 @@ const marginOf = (k, r) => k === "space" ? r.margin_of_exceedance : r.margin_db;
 [["space", SPACE], ["terra", TERRA]].forEach(([k, rows]) => {
   [...new Set(rows.map(r => r.country))].sort().forEach(c => $(`[data-adm=${k}]`).insertAdjacentHTML("beforeend", `<option value="${esc(c)}">${esc(admName(c))}</option>`));
   [...new Set(rows.map(r => r.result_class))].forEach(c => $(`[data-cls=${k}]`).insertAdjacentHTML("beforeend", `<option value="${esc(c)}">${esc((CLASS[c]||[,c])[1])}</option>`));
-  $(`[data-search=${k}]`).oninput = () => render(k); $(`[data-adm=${k}]`).onchange = () => render(k); $(`[data-cls=${k}]`).onchange = () => render(k);
+  $(`[data-search=${k}]`).oninput = () => render(k); $(`[data-adm=${k}]`).onchange = () => render(k); $(`[data-cls=${k}]`).onchange = () => render(k); $(`[data-prio=${k}]`).onchange = () => render(k);
   $$(`.seg[data-for=${k}] button`).forEach(b => b.onclick = () => setMode(k, b.dataset.v));
   render(k);
 });
 function setMode(k, mode){ STATE[k].mode = mode; $$(`.seg[data-for=${k}] button`).forEach(b => b.setAttribute("aria-pressed", b.dataset.v === mode)); render(k); }
 function render(k){
-  const st = STATE[k], q = $(`[data-search=${k}]`).value.toLowerCase().trim(), a = $(`[data-adm=${k}]`).value, c = $(`[data-cls=${k}]`).value;
+  const st = STATE[k], q = $(`[data-search=${k}]`).value.toLowerCase().trim(), a = $(`[data-adm=${k}]`).value, c = $(`[data-cls=${k}]`).value, pr = $(`[data-prio=${k}]`).value;
   let rows = rowsOf(k).filter(r => st.mode === "all" || (st.mode === "alerts") === (r._k === "alert"));
   rows.forEach((r,i) => r._rank = i+1);
-  rows = rows.filter(r => (!a || r.country === a) && (!c || r.result_class === c) && (!q || JSON.stringify(r).toLowerCase().includes(q)
+  rows = rows.filter(r => (!a || r.country === a) && (!c || r.result_class === c) && (!pr || r.priority === pr) && (!q || JSON.stringify(r).toLowerCase().includes(q)
          || (D.adm[r.country]||"").toLowerCase().includes(q)));
   const cols = COLS[k];
-  if (st.sort !== null) { const f = cols[st.sort][1]; rows = [...rows].sort((x,y) => { const p = f(x), q2 = f(y); return (typeof p === "number" && typeof q2 === "number" ? p-q2 : String(p).localeCompare(String(q2), undefined, {numeric:true})) * st.dir; }); }
+  if (st.sort !== null) { const f = cols[st.sort][3] || cols[st.sort][1]; rows = [...rows].sort((x,y) => { const p = f(x), q2 = f(y); return (typeof p === "number" && typeof q2 === "number" ? p-q2 : String(p).localeCompare(String(q2), undefined, {numeric:true})) * st.dir; }); }
   const maxM = Math.max(1, ...rowsOf(k).map(r => Math.abs(marginOf(k,r)||0)));
   const cell = (col, r) => { const v = col[1](r), t = col[2];
     if (t === "badge") return `<td>${badge(v)}</td>`;
+    if (t === "prio") return `<td>${prioBadge(v)}</td>`;
     if (t === "margin") return v === null || v === undefined ? `<td class="num note">n/a</td>` : `<td class="num"><div class="mbar"><b>${sgn(v)}</b><span class="b ${v<0?"neg":""}" style="width:${Math.max(2,Math.abs(v)/maxM*90)}px"></span></div></td>`;
     if (t === "name") return `<td class="name">${esc(v)}</td>`;
     if (t === "num1") return `<td class="num">${num(v)}</td>`;
@@ -570,7 +577,7 @@ function openDetail(k, r){
   const m = marginOf(k, r);
   let head, body;
   if (k === "space") {
-    head = `<h2>${esc(r.network_name)}</h2><div class="note">${esc(admName(r.country))} · notice ${esc(r.notice_id)}${r.related_notice_id ? ` (related ${esc(r.related_notice_id)})` : ""} · ${esc(r.notice_type)}</div><div style="margin-top:6px">${badge(r.result_class)}</div>`;
+    head = `<h2>${esc(r.network_name)}</h2><div class="note">${esc(admName(r.country))} · notice ${esc(r.notice_id)}${r.related_notice_id ? ` (related ${esc(r.related_notice_id)})` : ""} · ${esc(r.notice_type)}</div><div style="margin-top:6px;display:flex;gap:14px">${badge(r.result_class)}${r.priority ? prioBadge(r.priority) + ` <span class="note">${esc(r.priority_reason)}</span>` : ""}</div>`;
     body = `<div class="why"><div class="big">${m === null || m === undefined ? "ITU Bureau finding - checked against Finland" : `${sgn(m)} dB ${m>=0 ? "over" : "under"} the ${r.result_class==="COORDINATION REQUIRED" ? "coordination threshold" : "limit"}`}</div><div style="margin-top:6px">${esc(r.reason)}</div></div>
       ${r.pfd_dbw_m2 === null || r.pfd_dbw_m2 === undefined ? "" : `<h3>Key figures</h3>${kv([
         ["Calculated pfd", `${num(r.pfd_dbw_m2,2)} dB(W/m²) in ${esc(r.reference_bandwidth)}`],
@@ -588,7 +595,7 @@ function openDetail(k, r){
       <h3>Affected in Finland</h3>${kv([["M4 services in band", esc(r.m4_service) || "-"]])}<div style="margin-top:8px">${stationsBlock(r.finnish_station_id)}</div>
       <h3>Recommended letter</h3>${letterBlock("S:" + r.notice_id, `${r.country}_${r.notice_id}_${r.network_name}`)}`;
   } else {
-    head = `<h2>${esc(r.site_name)}</h2><div class="note">${esc(admName(r.country))} · assignment ${esc(r.notice_id)} · class ${esc(r.station_class)} · ${esc(r.change_type)}</div><div style="margin-top:6px">${badge(r.result_class)}</div>`;
+    head = `<h2>${esc(r.site_name)}</h2><div class="note">${esc(admName(r.country))} · assignment ${esc(r.notice_id)} · class ${esc(r.station_class)} · ${esc(r.change_type)}</div><div style="margin-top:6px;display:flex;gap:14px">${badge(r.result_class)}${r.priority ? prioBadge(r.priority) + ` <span class="note">${esc(r.priority_reason)}</span>` : ""}</div>`;
     body = `<div class="why"><div class="big">${sgn(m)} dB ${m>=0 ? "over" : "under"} the T/R 25-08 trigger</div><div style="margin-top:6px">${esc(r.reason)}</div></div>
       ${r.coordination_with_fin ? `<div class="callout"><b>Coordination with Finland recorded in the ITU data:</b> ${esc(r.coordination_with_fin)}<br><span class="note">Verify against the Traficom frequency register - the case remains flagged.</span></div>` : ""}
       <h3>Key figures</h3>${kv([

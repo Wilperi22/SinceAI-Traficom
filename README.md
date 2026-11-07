@@ -29,7 +29,7 @@ Unattended every two weeks (cron):
 |---|---|
 | **Extract** | A Space IFIC number or URL is downloaded from the ITU (`https://www.itu.int/sns/ific10/ific<N>.zip`); `.zip` is unpacked, `.mdb` converted to SQLite (`convert_mdb.py`, every table's row count verified against the MDB), cached by SHA-256 in `data/sqlite/`. Dataset type and IFIC number are detected from the data. `--refresh-m4` downloads the current M4 table from opendata.traficom.fi. |
 | **Transform** | Space: `inspection_engine.py`. Terrestrial: `terrestrial.py`. Draft letters for every alert: `letters.py`. |
-| **Load** | `runs/<kind>_<ific>/` (alerts.csv/.json, concerns.csv/.json, audit.txt, letters/), cumulative `results.sqlite` (runs + findings of every issue), `report.html` (issue selector, history). |
+| **Load** | `runs/<kind>_<ific>/` (**`<kind>_<ific>_results.xlsx`** with Summary/Alerts/Concerns/Method sheets, alerts.csv/.json, concerns.csv/.json, audit.txt, letters/), cumulative `results.sqlite` (runs + findings of every issue), `report.html` (issue selector, history). |
 
 Files already processed (same SHA-256) are skipped; `--force` re-runs them, `--report-only` rebuilds the page. Terrestrial screening requires Py1546; without it the pipeline stops with an error unless `--allow-free-space` is given (free-space upper bound, every case REVIEW only).
 
@@ -55,7 +55,7 @@ Files already processed (same SHA-256) are skipped; `--force` re-runs them, `--r
 * Coordination with Finland recorded in the IFIC is reported, not treated as closed; trends by
   administration/class/band are in the audit.
 
-**Alerts** = calculated exceedance of a cited criterion. **Concerns** = near-limit, limit not applicable,
+**Alerts** = calculated exceedance of a cited criterion, ordered by review **priority**: High (space: ≥ 10 dB, ITU BR finding X/21.16, or Finnish stations in band and ≥ 3 dB; terrestrial: ≥ 6 dB or a Finnish station above the trigger), Medium (space: ≥ 3 dB, Finnish stations in band or RR 9.14 coordination; terrestrial: 1-6 dB), Low (small margins; terrestrial < 1 dB is within modelling uncertainty). **Concerns** = near-limit, limit not applicable,
 worst-case inter-satellite beams, high pfd in bands without a limit, BR-unfavourable networks not visible
 from Finland. Margins are command-line options.
 
@@ -75,7 +75,7 @@ from Finland. Margins are command-line options.
 .venv/bin/python -m unittest -v tests.test_pipeline
 ```
 
-27 tests: physics against reference values, independent hand calculations of real findings from the raw
+30 tests: physics against reference values, independent hand calculations of real findings from the raw
 IFIC tables (CSN-SSO, PAZ_2-A, Kostomuksha), RR footnote rules, BR cross-check, and invariants on the
 outputs. Each audit file records input SHA-256 hashes and model versions.
 

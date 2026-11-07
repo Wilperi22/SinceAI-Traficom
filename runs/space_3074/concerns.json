@@ -28,6 +28,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
   "result_class":"LIMIT_NOT_APPLICABLE",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -116.4 dB(W\/m2) in 1 MHz at 5.0 deg elevation would exceed RR Table 21-4 limit -120.0 by 3.6 dB, but the limit applies only to systems of 99 or fewer satellites (RR 21.16.4); this system notifies 3212 satellites - limit subject to further study (worst case per Traficom guidance: peak gain 34.8 dBi toward Finland); 9550 combination(s) in rows 17700_19300_FSS_ISS_METSAT, 19300_19700_FSS_BSS_EESS_ISS_SR, 37500_40000_FSS_MSS_NGSO, 40000_40500_FSS_MSS, 42000_42500_FSS_BSS_NGSO",
   "concern_types":"LIMIT_NOT_APPLICABLE, NEAR_LIMIT"
  },
@@ -60,6 +62,8 @@
   "finnish_station_id":"989200(RX)",
   "m4_service":"MOBILE AND FIXED",
   "result_class":"WORST_CASE_ISS",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -68.1 dB(W\/m2) in 1 MHz at 90.0 deg elevation would exceed RR Table 21-4 limit -105.0 by 36.9 dB if the inter-satellite beam's peak gain pointed at Finland (worst case; beam normally points at another spacecraft) (worst case per Traficom guidance: peak gain 54.2 dBi toward Finland); 18 combination(s) in rows 25250_27500_FSS_BSS_EESS_ISS_SR, 8025_8500_EESS_SR, SCREEN_NO_LIMIT",
   "concern_types":"WORST_CASE_ISS, NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -92,6 +96,8 @@
   "finnish_station_id":"",
   "m4_service":"RADIONAVIGATION; FIXED",
   "result_class":"WORST_CASE_ISS",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -112.5 dB(W\/m2) in 1 MHz at 4.9 deg elevation would exceed RR Table 21-4 limit -135.0 by 22.5 dB if the inter-satellite beam's peak gain pointed at Finland (worst case; beam normally points at another spacecraft) (worst case per Traficom guidance: peak gain 42.0 dBi toward Finland); 8 combination(s) in rows 1670_1710_SO_SR_EESS_METSAT, 32300_33000_ISS, 8025_8500_EESS_SR, SCREEN_NO_LIMIT",
   "concern_types":"WORST_CASE_ISS, NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -124,6 +130,8 @@
   "finnish_station_id":"800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800005(RX);800006(RX);800007(RX);800008(RX);800009(RX);800010(RX);800011(RX);800012(RX);800013(RX);800014(RX);800015(RX);800016(RX);800017(RX);800018(RX);800019(RX);800020(RX);800021(RX);800022(RX);800023(RX);800024(RX);800025(RX);800026(RX);800027(RX);800028(RX);800029(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800065(RX);800066(RX);800067(RX);800068(RX);800069(RX);800070(RX);800071(RX);800072(RX);800073(RX);800074(RX);800075(RX);800076(RX);800077(RX);800078(RX);800079(RX);800080(RX);800081(RX);800082(RX);800083(RX);800084(RX);800085(RX);800086(RX);800087(RX);800088(RX);800089(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800125(RX);800126(RX);800127(RX);800128(RX);800129(RX);800130(RX);800131(RX);800132(RX);800133(RX);800134(RX);800135(RX);800136(RX);800137(RX);800138(RX);800139(RX);800140(RX);800141(RX);800142(RX);800143(RX);800144(RX);800145(RX);800146(RX);800147(RX);800148(RX);800149(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800185(RX);800186(RX);800187(RX);800188(RX);800189(RX);800190(RX);800191(RX);800192(RX);800193(RX);800194(RX);800195(RX);800196(RX);800197(RX);800198(RX);800199(RX);800200(RX);800201(RX);800202(RX);800203(RX);800204(RX);800205(RX);800206(RX);800207(RX);800208(RX);800209(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800245(RX);800246(RX);800247(RX);800248(RX);800249(RX);800250(RX);800251(RX);800252(RX);800253(RX);800254(RX);800255(RX);800256(RX);800257(RX);800258(RX);800259(RX);800260(RX);800261(RX);800262(RX);800263(RX);800264(RX);800265(RX);800266(RX);800267(RX);800268(RX);800269(RX);800300(RX);800301(RX);800302(RX);800306(RX);800307(RX);800308(RX);800311(RX);800312(RX);800313(RX);800317(RX);800318(RX);800319(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800035(TX);800036(TX);800037(TX);800038(TX);800039(TX);800040(TX);800041(TX);800042(TX);800043(TX);800044(TX);800045(TX);800046(TX);800047(TX);800048(TX);800049(TX);800050(TX);800051(TX);800052(TX);800053(TX);800054(TX);800055(TX);800056(TX);800057(TX);800058(TX);800059(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800095(TX);800096(TX);800097(TX);800098(TX);800099(TX);800100(TX);800101(TX);800102(TX);800103(TX);800104(TX);800105(TX);800106(TX);800107(TX);800108(TX);800109(TX);800110(TX);800111(TX);800112(TX);800113(TX);800114(TX);800115(TX);800116(TX);800117(TX);800118(TX);800119(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800155(TX);800156(TX);800157(TX);800158(TX);800159(TX);800160(TX);800161(TX);800162(TX);800163(TX);800164(TX);800165(TX);800166(TX);800167(TX);800168(TX);800169(TX);800170(TX);800171(TX);800172(TX);800173(TX);800174(TX);800175(TX);800176(TX);800177(TX);800178(TX);800179(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800215(TX);800216(TX);800217(TX);800218(TX);800219(TX);800220(TX);800221(TX);800222(TX);800223(TX);800224(TX);800225(TX);800226(TX);800227(TX);800228(TX);800229(TX);800230(TX);800231(TX);800232(TX);800233(TX);800234(TX);800235(TX);800236(TX);800237(TX);800238(TX);800239(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800275(TX);800276(TX);800277(TX);800278(TX);800279(TX);800280(TX);800281(TX);800282(TX);800283(TX);800284(TX);800285(TX);800286(TX);800287(TX);800288(TX);800289(TX);800290(TX);800291(TX);800292(TX);800293(TX);800294(TX);800295(TX);800296(TX);800297(TX);800298(TX);800299(TX);800303(TX);800304(TX);800305(TX);800309(TX);800310(TX);800314(TX);800315(TX);800316(TX)",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -144.1 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.1 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 4 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -156,6 +164,8 @@
   "finnish_station_id":"800027(RX);800028(RX);800029(RX);800087(RX);800088(RX);800089(RX);800147(RX);800148(RX);800149(RX);800207(RX);800208(RX);800209(RX);800267(RX);800268(RX);800269(RX);800308(RX);800319(RX);800057(TX);800058(TX);800059(TX);800117(TX);800118(TX);800119(TX);800177(TX);800178(TX);800179(TX);800237(TX);800238(TX);800239(TX);800297(TX);800298(TX);800299(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -144.1 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.1 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 60 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -188,6 +198,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -144.1 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.1 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 37 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -220,6 +232,8 @@
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -140.3 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.3 dB below RR Table 21-4 limit -140.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 18.0 dBi toward Finland); 92 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -252,6 +266,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -140.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.5 dB below RR Table 21-4 limit -140.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 21.5 dBi toward Finland); 2 combination(s) in rows 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -284,6 +300,8 @@
   "finnish_station_id":"800029(RX);800089(RX);800149(RX);800209(RX);800269(RX);800319(RX);800059(TX);800119(TX);800179(TX);800239(TX);800299(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -144.8 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 0.8 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.8 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -316,6 +334,8 @@
   "finnish_station_id":"800022(RX);800023(RX);800024(RX);800025(RX);800026(RX);800027(RX);800028(RX);800029(RX);800082(RX);800083(RX);800084(RX);800085(RX);800086(RX);800087(RX);800088(RX);800089(RX);800142(RX);800143(RX);800144(RX);800145(RX);800146(RX);800147(RX);800148(RX);800149(RX);800202(RX);800203(RX);800204(RX);800205(RX);800206(RX);800207(RX);800208(RX);800209(RX);800262(RX);800263(RX);800264(RX);800265(RX);800266(RX);800267(RX);800268(RX);800269(RX);800302(RX);800308(RX);800313(RX);800319(RX);800052(TX);800053(TX);800054(TX);800055(TX);800056(TX);800057(TX);800058(TX);800059(TX);800112(TX);800113(TX);800114(TX);800115(TX);800116(TX);800117(TX);800118(TX);800119(TX);800172(TX);800173(TX);800174(TX);800175(TX);800176(TX);800177(TX);800178(TX);800179(TX);800232(TX);800233(TX);800234(TX);800235(TX);800236(TX);800237(TX);800238(TX);800239(TX);800292(TX);800293(TX);800294(TX);800295(TX);800296(TX);800297(TX);800298(TX);800299(TX);800305(TX);800316(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -145.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 1.0 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 6.8 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -348,6 +368,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -145.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 1.0 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 2.0 dBi toward Finland); 9 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -380,6 +402,8 @@
   "finnish_station_id":"800029(RX);800089(RX);800149(RX);800209(RX);800269(RX);800319(RX);800059(TX);800119(TX);800179(TX);800239(TX);800299(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -145.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 1.0 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 2.0 dBi toward Finland); 2 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -412,6 +436,8 @@
   "finnish_station_id":"",
   "m4_service":"MOBILE; MOBILE-SATELLITE (SPACE-TO-EARTH); RADIODETERMINATION SATELLITE SERVICE (SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -129.1 dB(W\/m2) in 1 MHz at 9.6 deg elevation is 1.1 dB below RR Appendix 5 coordination threshold -128.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 27.4 dBi toward Finland); 52 combination(s) in rows 3400_4200_FSS_GSO, AP5_2483.5_2500_MSS_GSO, AP5_2483.5_2500_RDSS",
   "concern_types":"NEAR_LIMIT"
  },
@@ -444,6 +470,8 @@
   "finnish_station_id":"603413(RX);628219(RX);628728(RX);637357(RX);601452(TX);605729(TX);631021(TX);634993(TX)",
   "m4_service":"FIXED SATELLITE (EARTH-TO-SPACE); FIXED; FIXED SATELLITE (EARTH-TO-SPACE, SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -116.2 dB(W\/m2) in 1 MHz at 5.0 deg elevation is 1.2 dB below RR Table 21-4 limit -115.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 27.6 dBi toward Finland); 1040 combination(s) in rows 17700_19300_FSS_ISS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -476,6 +504,8 @@
   "finnish_station_id":"800026(RX);800027(RX);800028(RX);800029(RX);800086(RX);800087(RX);800088(RX);800089(RX);800146(RX);800147(RX);800148(RX);800149(RX);800206(RX);800207(RX);800208(RX);800209(RX);800266(RX);800267(RX);800268(RX);800269(RX);800308(RX);800319(RX);800056(TX);800057(TX);800058(TX);800059(TX);800116(TX);800117(TX);800118(TX);800119(TX);800176(TX);800177(TX);800178(TX);800179(TX);800236(TX);800237(TX);800238(TX);800239(TX);800296(TX);800297(TX);800298(TX);800299(TX);800316(TX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -146.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 2.5 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 7.0 dBi toward Finland); 2 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -508,6 +538,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -146.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 2.5 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 2 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -540,6 +572,8 @@
   "finnish_station_id":"",
   "m4_service":"Amateur; MOBILE AND FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -151.8 dB(W\/m2) in 4 kHz at 10.4 deg elevation is 2.5 dB below RR Table 21-4 limit -149.3 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 19.0 dBi toward Finland); 2032 combination(s) in rows 3400_4200_FSS_GSO, 7250_7900_FSS_METSAT_MSS_SR, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -572,6 +606,8 @@
   "finnish_station_id":"452076(RX);467765(RX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -146.6 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 2.6 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 7.0 dBi toward Finland); 6 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -604,6 +640,8 @@
   "finnish_station_id":"452076(RX);454152(RX);467765(RX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -146.9 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 2.9 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 6.9 dBi toward Finland); 5 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -636,6 +674,8 @@
   "finnish_station_id":"",
   "m4_service":"Amateur; MOBILE AND FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -151.8 dB(W\/m2) in 4 kHz at 11.2 deg elevation is 2.9 dB below RR Table 21-4 limit -148.9 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 19.0 dBi toward Finland); 2010 combination(s) in rows 3400_4200_FSS_GSO, 7250_7900_FSS_METSAT_MSS_SR, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -668,6 +708,8 @@
   "finnish_station_id":"800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800300(RX);800311(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800303(TX);800314(TX)",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -157.0 dB(W\/m2) in 4 kHz at 1.3 deg elevation is 3.0 dB below RR Table 21-4 limit -154.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 6.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -700,6 +742,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -157.0 dB(W\/m2) in 4 kHz at 5.0 deg elevation is 3.0 dB below RR Table 21-4 limit -154.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 6.5 dBi toward Finland); 4 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -732,6 +776,8 @@
   "finnish_station_id":"440557(RX);452076(RX);454152(RX);467765(RX);477781(RX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -147.2 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 3.2 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 4.9 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -764,6 +810,8 @@
   "finnish_station_id":"452076(RX);467765(RX)",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -147.3 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 3.3 dB below RR Table 21-4 limit -144.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 4.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -796,6 +844,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -158.3 dB(W\/m2) in 4 kHz at 5.0 deg elevation is 4.3 dB below RR Table 21-4 limit -154.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 6.5 dBi toward Finland); 5 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT, 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -828,6 +878,8 @@
   "finnish_station_id":"",
   "m4_service":"METEOROLOGICAL-SATELLITE (SPACE-TO-EARTH); MOBILE-SATELLITE (SPACE-TO-EARTH); SPACE OPERATION (SPACE-TO-EARTH) ",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -129.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 4.5 dB below RR Appendix 5 coordination threshold -125.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 0.0 dBi toward Finland); 16 combination(s) in rows AP5_137_138_MSS",
   "concern_types":"NEAR_LIMIT"
  },
@@ -860,6 +912,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED; SPACE OPERATION (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -159.0 dB(W\/m2) in 4 kHz at 5.0 deg elevation is 5.0 dB below RR Table 21-4 limit -154.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 4.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -892,6 +946,8 @@
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -145.2 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 5.2 dB below RR Table 21-4 limit -140.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 21.0 dBi toward Finland); 2 combination(s) in rows 8025_8500_EESS_SR, SCREEN_NO_LIMIT",
   "concern_types":"NEAR_LIMIT, NO_LIMIT_HIGH_PFD"
  },
@@ -924,6 +980,8 @@
   "finnish_station_id":"405674(RX)",
   "m4_service":"FIXED; EARTH EXPLORATION-SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -145.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 5.7 dB below RR Table 21-4 limit -140.0 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 19.5 dBi toward Finland); 1 combination(s) in rows 8025_8500_EESS_SR",
   "concern_types":"NEAR_LIMIT"
  },
@@ -956,6 +1014,8 @@
   "finnish_station_id":"800000(RX);800001(RX);800002(RX);800003(RX);800004(RX);800005(RX);800006(RX);800060(RX);800061(RX);800062(RX);800063(RX);800064(RX);800065(RX);800066(RX);800120(RX);800121(RX);800122(RX);800123(RX);800124(RX);800125(RX);800126(RX);800180(RX);800181(RX);800182(RX);800183(RX);800184(RX);800185(RX);800186(RX);800240(RX);800241(RX);800242(RX);800243(RX);800244(RX);800245(RX);800246(RX);800300(RX);800306(RX);800311(RX);800030(TX);800031(TX);800032(TX);800033(TX);800034(TX);800035(TX);800036(TX);800090(TX);800091(TX);800092(TX);800093(TX);800094(TX);800095(TX);800096(TX);800150(TX);800151(TX);800152(TX);800153(TX);800154(TX);800155(TX);800156(TX);800210(TX);800211(TX);800212(TX);800213(TX);800214(TX);800215(TX);800216(TX);800270(TX);800271(TX);800272(TX);800273(TX);800274(TX);800275(TX);800276(TX);800303(TX);800314(TX)",
   "m4_service":"FIXED",
   "result_class":"NEAR_LIMIT",
+  "priority":null,
+  "priority_reason":null,
   "reason":"PFD -158.5 dB(W\/m2) in 4 kHz at 7.5 deg elevation is 5.7 dB below RR Table 21-4 limit -152.8 (near-limit screening margin 6 dB) (worst case per Traficom guidance: peak gain 5.0 dBi toward Finland); 1 combination(s) in rows 2200_2300_SO_SR_EESS_METSAT",
   "concern_types":"NEAR_LIMIT"
  },
@@ -988,6 +1048,8 @@
   "finnish_station_id":"",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -88.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 61.3 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 48.8 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1020,6 +1082,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED; MOBILE",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -94.3 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 55.7 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 18.5 dBi toward Finland); 27 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1052,6 +1116,8 @@
   "finnish_station_id":"402006(RX);406317(RX);426809(RX);431061(RX);437813(RX);449364(RX);450279(RX);453048(RX);457628(RX);457709(RX);489065(RX);489475(RX)",
   "m4_service":"RADIOLOCATION; EARTH EXPLORATION-SATELLITE",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -103.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 46.5 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 43.0 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1084,6 +1150,8 @@
   "finnish_station_id":"",
   "m4_service":"MOBILE; Earth Exploration-Satellite; RADIOLOCATION",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -105.2 dB(W\/m2) in 4 kHz at 16.4 deg elevation is 44.8 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 43.0 dBi toward Finland); 4 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1116,6 +1184,8 @@
   "finnish_station_id":"",
   "m4_service":"MOBILE",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -111.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 38.5 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 32.0 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1148,6 +1218,8 @@
   "finnish_station_id":"",
   "m4_service":"Mobile; AMATEUR-SATELLITE; AMATEUR",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -121.0 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 29.0 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 1.0 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1180,6 +1252,8 @@
   "finnish_station_id":"",
   "m4_service":"Mobile; AMATEUR-SATELLITE; AMATEUR",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -121.4 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 28.6 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 3.0 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1212,6 +1286,8 @@
   "finnish_station_id":"",
   "m4_service":"MOBILE; METEOROLOGICAL-SATELLITE (EARTH-TO-SPACE); EARTH EXPLORATION-SATELLITE (EARTH-TO-SPACE); METEOROLOGICAL AIDS",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -126.8 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 23.2 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 2.1 dBi toward Finland); 1 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1244,6 +1320,8 @@
   "finnish_station_id":"",
   "m4_service":"AERONAUTICAL RADIONAVIGATION; RADIONAVIGATION-SATELLITE (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -128.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 21.5 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 4.6 dBi toward Finland); 4 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1276,6 +1354,8 @@
   "finnish_station_id":"",
   "m4_service":"AERONAUTICAL RADIONAVIGATION; RADIONAVIGATION-SATELLITE (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -128.5 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 21.5 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 4.6 dBi toward Finland); 3 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1308,6 +1388,8 @@
   "finnish_station_id":"",
   "m4_service":"Mobile; AMATEUR-SATELLITE; AMATEUR",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -128.7 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 21.3 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 0.0 dBi toward Finland); 1 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1340,6 +1422,8 @@
   "finnish_station_id":"",
   "m4_service":"Mobile; AMATEUR-SATELLITE; AMATEUR",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -129.4 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 20.6 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 1.6 dBi toward Finland); 2 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1372,6 +1456,8 @@
   "finnish_station_id":"",
   "m4_service":"METEOROLOGICAL AIDS; MOBILE-SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -132.6 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 17.4 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 0.2 dBi toward Finland); 1 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1404,6 +1490,8 @@
   "finnish_station_id":"",
   "m4_service":"AERONAUTICAL RADIONAVIGATION; RADIONAVIGATION-SATELLITE (SPACE-TO-EARTH, SPACE-TO-SPACE)",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -132.9 dB(W\/m2) in 4 kHz at 90.0 deg elevation is 17.1 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 20.0 dBi toward Finland); 22 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1436,6 +1524,8 @@
   "finnish_station_id":"",
   "m4_service":"FIXED; FIXED SATELLITE (SPACE-TO-EARTH)",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -137.4 dB(W\/m2) in 4 kHz at 29.1 deg elevation is 12.6 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 12.9 dBi toward Finland); 240 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1468,6 +1558,8 @@
   "finnish_station_id":"",
   "m4_service":"MOBILE; FIXED",
   "result_class":"NO_LIMIT_HIGH_PFD",
+  "priority":null,
+  "priority_reason":null,
   "reason":"No RR Table 21-4 limit for this band; PFD -139.9 dB(W\/m2) in 4 kHz at 22.2 deg elevation is 10.1 dB above the team screening level -150.0 dB(W\/m2) in 4 kHz, in a band used by Finnish stations (worst case per Traficom guidance: peak gain 15.0 dBi toward Finland); 80 combination(s) in rows SCREEN_NO_LIMIT",
   "concern_types":"NO_LIMIT_HIGH_PFD"
  },
@@ -1500,6 +1592,8 @@
   "finnish_station_id":null,
   "m4_service":null,
   "result_class":"BR_UNFAVOURABLE_21_16",
+  "priority":null,
+  "priority_reason":null,
   "reason":"The ITU Radiocommunication Bureau found the No. 21.16 pfd limit exceeded (finding X\/21.16 on 756 group(s)). The Bureau checks the whole Earth's surface; over Finland: never visible (inclination 148 deg = 32 deg latitude reach, altitude 340-614 km)",
   "concern_types":"BR_UNFAVOURABLE_21_16"
  },
@@ -1532,6 +1626,8 @@
   "finnish_station_id":null,
   "m4_service":null,
   "result_class":"BR_UNFAVOURABLE_21_16",
+  "priority":null,
+  "priority_reason":null,
   "reason":"The ITU Radiocommunication Bureau found the No. 21.16 pfd limit exceeded (finding X\/21.16 on 4 group(s)). The Bureau checks the whole Earth's surface; over Finland: never visible (inclination 4 deg = 4 deg latitude reach, altitude 350-700 km)",
   "concern_types":"BR_UNFAVOURABLE_21_16"
  }

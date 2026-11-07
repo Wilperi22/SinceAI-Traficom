@@ -127,7 +127,7 @@ OUTPUT_COLUMNS = [
     "longitude", "geo_type", "radius_km", "frequency_mhz", "bandwidth_khz", "emission", "erp_dbw",
     "tx_height_m", "worst_point_lat", "worst_point_lon", "worst_point_type", "distance_km", "path",
     "model", "field_strength_dbuv_m", "threshold_dbuv_m", "margin_db", "finnish_station_id",
-    "m4_service", "coordination_with_fin", "itu_remarks", "result_class", "reason",
+    "m4_service", "coordination_with_fin", "itu_remarks", "result_class", "priority", "priority_reason", "reason",
 ]
 
 
@@ -299,12 +299,31 @@ def terrestrial_report(database: Path, stations: pd.DataFrame, m4: pd.DataFrame,
     rows["reason"] = [reason(r, min_exceedance_db, near_limit_db) for r in rows.itertuples()]
 
     out = format_rows(rows, m4)
-    alerts = out[out["result_class"] == "CRITICAL ERROR"].sort_values("margin_db", ascending=False)
+    alerts = prioritise_terrestrial(out[out["result_class"] == "CRITICAL ERROR"])
     concerns = out[out["result_class"].isin(["SUB_QA_EXCEEDANCE", "NEAR_LIMIT", "REVIEW:P1546_UNAVAILABLE"])]
     concerns = concerns.sort_values(["result_class", "margin_db"], ascending=[True, False])
     note(f"Alerts (margin >= {min_exceedance_db:g} dB): {len(alerts)}; concerns: {len(concerns)} "
          f"({', '.join(f'{c}: {n}' for c, n in concerns['result_class'].value_counts().items())})")
     return alerts.reindex(columns=OUTPUT_COLUMNS), concerns.reindex(columns=OUTPUT_COLUMNS)
+
+
+def prioritise_terrestrial(alerts: pd.DataFrame) -> pd.DataFrame:
+    """Deterministic review priority for terrestrial alerts.
+
+    High:   margin >= 6 dB, or a Finnish special-interest station receives more than the trigger.
+    Medium: margin 1-6 dB.
+    Low:    margin below 1 dB (within P.1546 / boundary modelling uncertainty).
+    """
+    alerts = alerts.copy()
+    margin = pd.to_numeric(alerts["margin_db"], errors="coerce").fillna(0)
+    stations = alerts["finnish_station_id"].fillna("").astype(str).str.len() > 0
+    alerts["priority"] = np.select([(margin >= 6) | stations, margin >= 1], ["High", "Medium"], default="Low")
+    alerts["priority_reason"] = [
+        f"{m:+.1f} dB" + ("; Finnish station above trigger" if s else "")
+        + ("; within modelling uncertainty (< 1 dB)" if m < 1 and not s else "")
+        for m, s in zip(margin, stations)]
+    rank = alerts["priority"].map(["High", "Medium", "Low"].index)
+    return alerts.assign(_r=rank).sort_values(["_r", "margin_db"], ascending=[True, False]).drop(columns="_r")
 
 
 def evaluate(r, border: dict, stations: pd.DataFrame) -> dict:

@@ -2,7 +2,7 @@ SPACE IFIC 3083 - pipeline run
 Source: ific3083.zip (sha256 8c44121e9a3a7b1db10e76b7227d481e3b2464e65d22e0e827bf43fdab92c1df)
 Database: data/sqlite/ific3083_8c44121e9a3a.sqlite
 Alert gate: margin >= 0 dB; near-limit 6 dB
-Run (UTC): 2026-11-07T17:35:25+00:00
+Run (UTC): 2026-11-07T17:42:44+00:00
 Input ific3083_8c44121e9a3a.sqlite: sha256 93bb2b6eeea42aa3f7386bb21cc7147d82202f2e874082262714dcd99d370e01 (109715456 bytes)
 Input pfd.json: sha256 66b6bf5430b71c29cee0ed0ab7a72676029e4932d5e7d20b3a90f3ecc3bf0f61 (13514 bytes)
 Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
@@ -19,4 +19,5 @@ Not visible from Finland or no orbit data: 35 notices dropped
 Evaluated 65002 group/emission/row combinations over 84 notices; exceedances >0 dB: 20006, >= 0 dB: 20006 in 48 notices
 ITU BR findings X/21.16 in this issue: 2 notices; alerts here: 2; listed as BR_UNFAVOURABLE_21_16 concerns: 0
 Concerns (separate CSV, networks without an alert): 28 - SUB_QA_EXCEEDANCE: 0, LIMIT_NOT_APPLICABLE: 0, WORST_CASE_ISS: 0, BR_UNFAVOURABLE_21_16: 0, NEAR_LIMIT: 19, NO_LIMIT_HIGH_PFD: 9
+Alert priority: High: 16, Medium: 10, Low: 8
 Exported 34 alerts and 28 concerns in 1.9 s

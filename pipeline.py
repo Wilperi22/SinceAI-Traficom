@@ -201,10 +201,79 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
     run = {"kind": kind, "ific": ific, "run_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "source": source.name, "source_sha256": digest, "n_alerts": len(alerts), "n_concerns": len(concerns),
            "seconds": round(seconds, 1)}
+    write_workbook(out / f"{kind}_{ific}_results.xlsx", kind, ific, run, alerts, concerns)
     store(run, alerts, concerns)
     log(f"  {kind} IFIC {ific}: {len(alerts)} alerts, {len(concerns)} concerns -> {out.relative_to(ROOT)}/ "
         f"({seconds:.1f} s)")
     return run
+
+
+SPACE_FIRST = ["priority", "network_name", "country", "notice_id", "related_notice_id", "notice_type", "orbit",
+               "frequency_mhz", "result_class", "margin_of_exceedance", "pfd_dbw_m2", "pfd_limit_dbw_m2",
+               "reference_bandwidth", "elevation_deg", "rr_reference", "br_finding", "priority_reason", "reason"]
+TERRA_FIRST = ["priority", "site_name", "country", "notice_id", "station_class", "change_type", "frequency_mhz",
+               "result_class", "margin_db", "field_strength_dbuv_m", "threshold_dbuv_m", "distance_km",
+               "worst_point_type", "coordination_with_fin", "priority_reason", "reason"]
+METHOD = {
+    "space": [
+        ("Criterion", "ITU RR Ed. 2024 Vol. 1 Art. 21 No. 21.16, Table 21-4 (Rev.WRC-23), angle-of-arrival dependent, "
+                      "incl. footnotes 11 (<= 99 satellites), 18 (EESS active mean pfd), 24/25 (HEO)"),
+        ("Criterion", "ITU RR Ed. 2024 Vol. 2 Appendix 5 Annex 1 coordination thresholds (No. 9.14), Table 5-2 NOTE 9 for Finland"),
+        ("Scope", "API/A, CR/C, AP30/30A/30B and Art. 11 notifications of Earth-orbiting space stations"),
+        ("Geometry", "GSO from orbital longitude; non-GSO at every elevation reachable from Finland (perigee/apogee/inclination); "
+                     "evaluated at the Traficom station sites and Finnish border/sea extremes"),
+        ("Worst case", "Peak antenna gain toward Finland (Traficom guidance)"),
+        ("Alert", "Calculated pfd exceeds the cited limit/threshold (any margin > 0 dB)"),
+        ("Priority High", ">= 10 dB, or ITU BR finding X/21.16, or Finnish stations in band and >= 3 dB"),
+        ("Priority Medium", ">= 3 dB, or Finnish stations in band, or RR 9.14 coordination required"),
+        ("Priority Low", "0-3 dB without Finnish stations in band"),
+        ("Concerns", "near limit (6 dB), limit not applicable (> 99 satellites), worst-case inter-satellite beams, "
+                     "high pfd in bands without a limit, ITU-unfavourable networks not visible from Finland"),
+    ],
+    "terrestrial": [
+        ("Criterion", "CEPT ECC T/R 25-08 A1.2.3: 20 dB(uV/m) in 25 kHz (+10log(BW/25 kHz) for wider channels)"),
+        ("Model", "ITU-R P.1546-6 (ITU-R WP 3K reference implementation Py1546), 10% time, 50% locations, h2 = 10 m, "
+                  "land / cold-sea mixed paths, no terrain profile"),
+        ("Scope", "Foreign land-mobile assignments (FB, FL, ML), NEW and MODIFIED; within 1000 km of Finland"),
+        ("Evaluation points", "Finnish land border and territorial sea (Natural Earth 1:10m); Traficom stations on overlapping frequencies"),
+        ("Worst case", "Maximum notified e.r.p. toward Finland; mobile stations at the circle edge nearest Finland"),
+        ("Priority High", ">= 6 dB, or a Finnish station above the trigger"),
+        ("Priority Medium", "1-6 dB"),
+        ("Priority Low", "< 1 dB (within modelling uncertainty)"),
+        ("Coordination", "Coordination recorded with Finland in the IFIC is reported, not treated as closed"),
+    ],
+}
+
+
+def write_workbook(path: Path, kind: str, ific: int, run: dict, alerts: pd.DataFrame, concerns: pd.DataFrame) -> None:
+    """Excel submission file (Traficom: xls/csv preferred for quick evaluation)."""
+    from openpyxl.styles import Alignment, Font
+    first = SPACE_FIRST if kind == "space" else TERRA_FIRST
+    order = lambda df: df[[c for c in first if c in df] + [c for c in df.columns if c not in first]]  # noqa: E731
+    summary = [("Dataset", f"{'Space' if kind == 'space' else 'Terrestrial'} BR IFIC {ific}"),
+               ("Source file", run["source"]), ("Source SHA-256", run["source_sha256"]), ("Processed (UTC)", run["run_utc"]),
+               ("Alerts", len(alerts))]
+    summary += [(f"  priority {p}", int((alerts.get("priority") == p).sum())) for p in ("High", "Medium", "Low")]
+    summary += [(f"  {c}", n) for c, n in alerts["result_class"].value_counts().items()]
+    summary += [("Concerns", len(concerns))] + [(f"  {c}", n) for c, n in concerns["result_class"].value_counts().items()]
+    summary += [("", ""), ("How to read", "Alerts: calculated exceedance of a cited criterion, sorted by priority. "
+                                          "Concerns: screening cases below alert level. Draft letters: letters/ folder.")]
+    with pd.ExcelWriter(path, engine="openpyxl") as xw:
+        pd.DataFrame(summary, columns=["Item", "Value"]).to_excel(xw, "Summary", index=False)
+        order(alerts).to_excel(xw, "Alerts", index=False)
+        order(concerns).to_excel(xw, "Concerns", index=False)
+        pd.DataFrame(METHOD[kind], columns=["Topic", "Description"]).to_excel(xw, "Method", index=False)
+        for ws in xw.book.worksheets:
+            ws.freeze_panes = "A2"
+            ws.auto_filter.ref = ws.dimensions
+            for cell in ws[1]:
+                cell.font = Font(bold=True)
+            for col in ws.columns:
+                width = max(len(str(c.value or "")) for c in list(col)[:200])
+                ws.column_dimensions[col[0].column_letter].width = min(max(10, width + 2), 70)
+                if width > 70:
+                    for c in col:
+                        c.alignment = Alignment(wrap_text=True, vertical="top")
 
 
 def store(run: dict, alerts: pd.DataFrame, concerns: pd.DataFrame) -> None:
