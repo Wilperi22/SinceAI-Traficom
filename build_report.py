@@ -536,7 +536,7 @@ $$("[data-slide]").forEach(b => b.onclick = () => $(`#t${b.dataset.slide}`).pare
 
 // ---------- map (SVG, offline; outline from geodata/map_outline.json) ----------
 const COSL = Math.cos(63 * Math.PI / 180);
-function mapSVG({bbox, markers = [], lines = [], circles = [], height = 420}) {
+function mapSVG({bbox, markers = [], lines = [], circles = [], height = 420, fit = false}) {
   if (!D.map) return `<p class="note">Map outline not available (run build_boundaries.py).</p>`;
   const [la0, la1, lo0, lo1] = bbox, X = lo => (lo - lo0) * COSL, Y = la => la1 - la;
   const w = (lo1 - lo0) * COSL, h = la1 - la0, k = Math.max(w, h * 1.6) / 420;   // marker scale ~ px
@@ -550,7 +550,7 @@ function mapSVG({bbox, markers = [], lines = [], circles = [], height = 420}) {
     const shape = m.shape === "tri" ? `<path d="M${x},${y - s}L${x + s},${y + s * .8}L${x - s},${y + s * .8}Z"/>` : `<circle cx="${x}" cy="${y}" r="${s * .8}"/>`;
     return `<g class="mk" data-m="${i}" fill="${m.color}" stroke="var(--surface)" stroke-width="${1.2*k}">${shape}${m.label ? `<text x="${x + s * 1.4}" y="${y + s * .4}" style="font-size:${13*k}px;fill:var(--ink);stroke:var(--surface);stroke-width:${3*k}px;paint-order:stroke">${esc(m.label)}</text>` : ""}</g>`;
   }).join("");
-  return `<svg class="map" viewBox="0 0 ${w} ${h}" style="height:${height}px" role="img" aria-label="Map of Finland and neighbouring areas"><rect class="sea" width="${w}" height="${h}"/>${land}${cs}${ls}${ms}</svg>`;
+  return `<svg class="map" viewBox="0 0 ${w} ${h}" style="height:${height}px${fit ? ";width:auto;max-width:100%;margin:0 auto" : ""}" role="img" aria-label="Map of Finland and neighbouring areas"><rect class="sea" x="${-5 * w}" y="${-5 * h}" width="${11 * w}" height="${11 * h}"/>${land}${cs}${ls}${ms}</svg>`;
 }
 const PCOL = p => ({High: "var(--critical)", Medium: "var(--serious)", Low: "var(--warning)"}[p] || "var(--neutral)");
 function renderOverviewMap() {
@@ -560,7 +560,7 @@ function renderOverviewMap() {
     color: r._k === "alert" ? PCOL(r.priority) : "var(--neutral)", size: r._k === "alert" ? 8 : 6, r}));
   const lats = rows.map(r => r.latitude), lons = rows.map(r => r.longitude);
   const bbox = [Math.min(59.0, ...lats) - .5, Math.max(70.2, ...lats) + .3, Math.min(19.5, ...lons) - 1, Math.max(31.8, ...lons) + 1];
-  $("#ovmap").innerHTML = mapSVG({bbox, markers, height: 520}) + `<div class="maplegend">
+  $("#ovmap").innerHTML = mapSVG({bbox, markers, height: 520, fit: true}) + `<div class="maplegend">
     <span><span style="color:var(--critical)">▲</span> alert, high priority</span><span><span style="color:var(--serious)">▲</span> medium</span>
     <span><span style="color:var(--warning)">▲</span> low</span><span><span style="color:var(--neutral)">●</span> concern</span></div>`;
   $$("#ovmap .mk").forEach(g => { const m = markers[+g.dataset.m];
