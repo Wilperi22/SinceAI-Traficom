@@ -6,9 +6,9 @@ import subprocess
 import sqlite3
 import sys
 
-MDB_PATH = "/home/niksu/Downloads/ific3083.mdb"
+MDB_PATH = "/home/niksu/Downloads/ific3074.mdb"
 OUTPUT_DIR = "/home/niksu/Documents/SinceAI-Traficom"
-OUTPUT_DB = os.path.join(OUTPUT_DIR, "ific3083.sqlite")
+OUTPUT_DB = os.path.join(OUTPUT_DIR, "ific3074.sqlite")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,8 +18,7 @@ if os.path.exists(OUTPUT_DB):
 
 # 2. Get all table names
 result = subprocess.run(
-    ["mdb-tables", "-1", MDB_PATH],
-    capture_output=True, text=True, check=True
+    ["mdb-tables", "-1", MDB_PATH], capture_output=True, text=True, check=True
 )
 tables = [t.strip() for t in result.stdout.strip().splitlines() if t.strip()]
 print(f"Found {len(tables)} tables in MDB.")
@@ -35,8 +34,7 @@ cur.execute("PRAGMA temp_store = MEMORY;")
 # 4. Extract and apply DDL Schema
 print("\nExtracting schema...")
 schema_res = subprocess.run(
-    ["mdb-schema", MDB_PATH, "sqlite"],
-    capture_output=True, text=True, check=True
+    ["mdb-schema", MDB_PATH, "sqlite"], capture_output=True, text=True, check=True
 )
 schema_sql = schema_res.stdout.strip()
 
@@ -65,10 +63,12 @@ print("\nImporting table data...")
 for i, table in enumerate(tables, 1):
     export_res = subprocess.run(
         ["mdb-export", "-I", "sqlite", MDB_PATH, table],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     )
     sql_text = export_res.stdout.strip()
-    
+
     if not sql_text:
         print(f"  [{i}/{len(tables)}] {table}: empty or no data, skipping")
         continue
