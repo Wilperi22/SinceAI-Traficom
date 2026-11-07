@@ -401,7 +401,7 @@ def main() -> None:
     parser.add_argument("--ific-number", type=int, default=3076)
     parser.add_argument("--m4", type=Path, default=Path("m4.json"))
     parser.add_argument("--stations", type=Path,
-                        default=Path("Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx"))
+                        default=Path("Traficom materials") / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx")
     parser.add_argument("--border-file", type=Path,
                         default=DEFAULT_BORDER_FILE if DEFAULT_BORDER_FILE.exists() else None,
                         help="CSV with columns lat, lon, type ('land border' / 'territorial sea'); default "

@@ -669,7 +669,7 @@ def main() -> None:
     parser.add_argument("--shield", type=Path, default=Path("pfd.json"), help="Table 21-4 limit register")
     parser.add_argument("--m4", type=Path, default=Path("m4.json"))
     parser.add_argument("--stations", type=Path,
-                        default=Path("Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx"))
+                        default=Path("Traficom materials") / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx")
     parser.add_argument("--exclude-notifications", action="store_true",
                         help="Scan only API/A, CR/C and AP30 (drop Article 11 notifications, ntf_rsn N)")
     parser.add_argument("--min-exceedance-db", type=float, default=MIN_EXCEEDANCE_MARGIN_DB)

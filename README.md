@@ -1,5 +1,7 @@
 # IFIC interference screening for Finland (SinceAI 2026 · Traficom)
 
+Since AI Hackathon 2026 - Traficom challenge *"Saving Earth from Space Interferers Using Radio Frequencies"*.
+
 An ETL pipeline that turns each new ITU BR IFIC (published every two weeks) into an
 expert-reviewable analysis of cases relevant to Finland: Space IFIC PFD over Finnish
 territory, and Terrestrial IFIC land-mobile field strength at the Finnish border, with
@@ -9,8 +11,8 @@ draft correspondence and a self-contained HTML report.
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt   # needs mdbtools for .mdb input
-cp ~/Downloads/<new IFIC>.zip inbox/                                 # Space or Terrestrial, .zip/.mdb/.sqlite
-.venv/bin/python pipeline.py                                         # extract -> analyse -> load -> report
+.venv/bin/python pipeline.py 3083                                    # download Space IFIC 3083 from the ITU and analyse it
+cp ~/Downloads/<terrestrial IFIC>.zip inbox/ && .venv/bin/python pipeline.py   # or drop any .zip/.mdb/.sqlite in inbox/
 xdg-open report.html
 ```
 
@@ -24,7 +26,7 @@ Unattended every two weeks (cron):
 
 | Stage | What happens |
 |---|---|
-| **Extract** | `.zip` (ITU download) is unpacked, `.mdb` converted to SQLite (`convert_mdb.py`, every table's row count verified against the MDB), cached by SHA-256 in `data/sqlite/`. Dataset type and IFIC number are detected from the data. `--refresh-m4` downloads the current M4 table from opendata.traficom.fi. |
+| **Extract** | A Space IFIC number or URL is downloaded from the ITU (`https://www.itu.int/sns/ific10/ific<N>.zip`); `.zip` is unpacked, `.mdb` converted to SQLite (`convert_mdb.py`, every table's row count verified against the MDB), cached by SHA-256 in `data/sqlite/`. Dataset type and IFIC number are detected from the data. `--refresh-m4` downloads the current M4 table from opendata.traficom.fi. |
 | **Transform** | Space: `inspection_engine.py`. Terrestrial: `terrestrial.py`. Draft letters for every alert: `letters.py`. |
 | **Load** | `runs/<kind>_<ific>/` (alerts.csv/.json, concerns.csv/.json, audit.txt, letters/), cumulative `results.sqlite` (runs + findings of every issue), `report.html` (issue selector, history). |
 
@@ -62,7 +64,7 @@ from Finland. Margins are command-line options.
 |---|---|
 | Space / Terrestrial IFIC | ITU BR IFIC downloads (.zip/.mdb) |
 | `m4.json` | Traficom open data API v13 `Taajuusjakotaulukko` (M4) |
-| `Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx` | Traficom special-interest stations |
+| `Traficom materials/` | Challenge brief, `READ_ME_FIRST.txt`, the special-interest station Excel (SHA-256 verified against `SHA256SUMS.txt`) |
 | `pfd.json` | RR Table 21-4 + App. 5 thresholds (transcribed from RR Ed. 2024 Vol. 1/2) |
 | `geodata/` | Finnish land border, territorial sea, land mask (`build_boundaries.py`) |
 
@@ -75,3 +77,16 @@ from Finland. Margins are command-line options.
 27 tests: physics against reference values, independent hand calculations of real findings from the raw
 IFIC tables (CSN-SSO, PAZ_2-A, Kostomuksha), RR footnote rules, BR cross-check, and invariants on the
 outputs. Each audit file records input SHA-256 hashes and model versions.
+
+## Other tools in the repository
+
+| File | Description |
+|---|---|
+| `process_itu_mdb.py` | Stand-alone downloader/converter: IFIC number, ITU URL, .zip or .mdb -> SQLite, plus the analytical view `vw_space_<N>_pfd_inputs`. `python process_itu_mdb.py 3083 <output_dir>` |
+| `app.py` | Streamlit natural-language explorer of the Space IFIC database with an interactive map of the Finnish stations: `pip install streamlit folium streamlit-folium && streamlit run app.py` (expects `ific3074.sqlite` in the repository root) |
+| `schema.txt` | Full DDL of the converted Space IFIC 3074 database |
+| `convert_mdb.py` | MDB -> SQLite converter with per-table row-count verification (used by `pipeline.py`) |
+
+## Contacts
+
+Traficom: Pekka Pussinen, Otto Julkunen (Since AI Discord). Challenge materials © Traficom; code for hackathon purposes.

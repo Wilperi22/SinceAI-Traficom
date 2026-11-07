@@ -35,7 +35,7 @@ TERRA_RUN = ROOT / "runs" / "terrestrial_3076"
 SPACE_REPORT = SPACE_RUN / "alerts.csv"
 SPACE_CONCERNS = SPACE_RUN / "concerns.csv"
 TERRA_REPORT = TERRA_RUN / "alerts.csv"
-EXCEL = ROOT / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx"
+EXCEL = ROOT / "Traficom materials" / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx"
 
 
 class SpacePhysics(unittest.TestCase):

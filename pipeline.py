@@ -3,6 +3,7 @@
 
     python pipeline.py                                   # process every new file in inbox/
     python pipeline.py ific3080.zip brific3082.mdb       # process given files
+    python pipeline.py 3080                              # download Space IFIC 3080 from the ITU and process it
     python pipeline.py --refresh-m4 inbox/*.zip          # also refresh M4 from the Traficom API
     python pipeline.py --report-only                     # rebuild report.html from stored runs
 
@@ -44,10 +45,11 @@ DATA = ROOT / "data"
 RUNS = ROOT / "runs"
 RESULTS_DB = ROOT / "results.sqlite"
 M4_URL = "https://opendata.traficom.fi/api/v13/Taajuusjakotaulukko"
+ITU_SPACE_IFIC_URL = "https://www.itu.int/sns/ific10/ific{num}.zip"   # as in process_itu_mdb.py
 DEFAULTS = {
     "m4": ROOT / "m4.json",
     "limits": ROOT / "pfd.json",
-    "stations": ROOT / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx",
+    "stations": ROOT / "Traficom materials" / "Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx",
     "border": ROOT / "geodata" / "finland_boundaries.csv",
 }
 
@@ -97,6 +99,23 @@ def to_sqlite(source: Path, digest: str) -> Path:
     convert(mdb, cached, log=lambda m: log("  " + m.strip()))
     log(f"  MDB -> SQLite in {time.time() - started:.0f} s")
     return cached
+
+
+def download(spec: str) -> Path:
+    """IFIC number (e.g. 3080) or https URL -> downloaded zip in inbox/ (kept for the audit trail)."""
+    url = ITU_SPACE_IFIC_URL.format(num=spec) if spec.isdigit() else spec
+    target = INBOX / Path(url.split("?")[0]).name
+    if target.exists():
+        log(f"  already downloaded {target.relative_to(ROOT)}")
+        return target
+    log(f"  downloading {url}")
+    INBOX.mkdir(exist_ok=True)
+    partial = target.with_suffix(target.suffix + ".partial")
+    with urllib.request.urlopen(url, timeout=600) as response, partial.open("wb") as out:
+        shutil.copyfileobj(response, out)
+    partial.rename(target)
+    log(f"  saved {target.relative_to(ROOT)} ({target.stat().st_size >> 20} MB)")
+    return target
 
 
 def detect(db: Path) -> tuple[str, int]:
@@ -214,7 +233,8 @@ def already_processed(digest: str) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("inputs", nargs="*", type=Path, help="IFIC files (.zip/.mdb/.sqlite); default: inbox/*")
+    parser.add_argument("inputs", nargs="*", help="IFIC files (.zip/.mdb/.sqlite), Space IFIC numbers to download "
+                                                  "from the ITU (e.g. 3080) or https URLs; default: inbox/*")
     parser.add_argument("--refresh-m4", action="store_true", help="Download the current M4 table first")
     parser.add_argument("--force", action="store_true", help="Re-process files already in results.sqlite")
     parser.add_argument("--report-only", action="store_true", help="Only rebuild report.html")
@@ -235,8 +255,18 @@ def main() -> None:
 
     if not cfg.report_only:
         INBOX.mkdir(exist_ok=True)
-        inputs = cfg.inputs or sorted(p for p in INBOX.iterdir() if p.suffix.lower() in
-                                      (".zip", ".mdb", ".accdb", ".sqlite", ".db"))
+        inputs = []
+        for spec in cfg.inputs:
+            if spec.isdigit() or spec.startswith(("http://", "https://")):
+                try:
+                    inputs.append(download(spec))
+                except Exception as exc:
+                    log(f"{spec}: download FAILED: {type(exc).__name__}: {exc}")
+            else:
+                inputs.append(Path(spec))
+        if not cfg.inputs:
+            inputs = sorted(p for p in INBOX.iterdir() if p.suffix.lower() in
+                            (".zip", ".mdb", ".accdb", ".sqlite", ".db"))
         if not inputs:
             log(f"No input files (put new IFIC downloads in {INBOX.relative_to(ROOT)}/)")
         failures = 0
