@@ -74,7 +74,9 @@ def resolve_input(input_arg, work_dir):
         return extract_zip(input_arg, work_dir)
 
     print(f"ERROR: Cannot resolve input: {input_arg}")
-    print("  Expected: local .mdb path, IFIC number (e.g., 3074), ITU zip URL, or local .zip path")
+    print(
+        "  Expected: local .mdb path, IFIC number (e.g., 3074), ITU zip URL, or local .zip path"
+    )
     sys.exit(1)
 
 
@@ -101,7 +103,7 @@ def extract_zip(zip_path, work_dir):
     print(f"Extracting: {zip_path}")
     mdb_files = []
 
-    with zipfile.ZipFile(zip_path, 'r') as zf:
+    with zipfile.ZipFile(zip_path, "r") as zf:
         # Find .mdb files in zip
         for name in zf.namelist():
             if name.lower().endswith(".mdb"):
@@ -268,7 +270,15 @@ def main():
         conn, tables = convert_mdb_to_sqlite(mdb_path, output_db)
 
         # Step 2: Create analytical view (only if tables look like Space IFIC)
-        required_tables = {"notice", "grp", "freq", "emiss", "s_beam", "geo", "tr_aff_ntw"}
+        required_tables = {
+            "notice",
+            "grp",
+            "freq",
+            "emiss",
+            "s_beam",
+            "geo",
+            "tr_aff_ntw",
+        }
         if required_tables.issubset(set(tables)):
             create_space_ific_view(conn, ific_number)
         else:
@@ -284,3 +294,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
