@@ -171,6 +171,4 @@ Fresh-clone check: `pipeline.py s3074 t3076` downloads both evaluation issues fr
 | `build_boundaries.py` | Builds `geodata/` from Natural Earth 1:10m |
 | `Table 21-4.odt`, `interference_check_criteria.txt` | Working notes |
 
-## Contacts
 
-Traficom: Pekka Pussinen, Otto Julkunen (Since AI Discord). Challenge materials © Traficom; code for hackathon purposes.
