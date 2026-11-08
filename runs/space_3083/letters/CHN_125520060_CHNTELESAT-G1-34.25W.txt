@@ -2,7 +2,7 @@ DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
 
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of China (People's Republic of) (CHN)
-Date: 2026-11-07
+Date: 2026-11-08
 Subject: BR IFIC 3083 - satellite network CHNTELESAT-G1-34.25W, notice 125520060 (and related notice 325520060):
          power flux-density over Finnish territory - exceeding RR Table 21-4
 

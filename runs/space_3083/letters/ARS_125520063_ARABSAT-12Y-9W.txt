@@ -2,7 +2,7 @@ DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
 
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of Saudi Arabia (Kingdom of) (ARS)
-Date: 2026-11-07
+Date: 2026-11-08
 Subject: BR IFIC 3083 - satellite network ARABSAT-12Y-9W, notice 125520063 (and related notice 325520063):
          power flux-density over Finnish territory - exceeding RR Table 21-4
 

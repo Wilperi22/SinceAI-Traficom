@@ -2,7 +2,7 @@ DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
 
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of United Kingdom (G)
-Date: 2026-11-07
+Date: 2026-11-08
 Subject: BR IFIC 3083 - satellite network SSG-CSL, notice 116520381 (and related notice 326520021):
          power flux-density over Finnish territory - exceeding RR Table 21-4
 

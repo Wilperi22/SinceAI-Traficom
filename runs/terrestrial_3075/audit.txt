@@ -2,7 +2,7 @@ TERRESTRIAL IFIC 3075 - pipeline run
 Source: brific3075.zip (sha256 6f63a3dee548422cc722fd95adf7ce99f13abd8c786459d535c73e3320ed92f7)
 Database: data/sqlite/brific3075_6f63a3dee548.sqlite
 Criterion: ECC T/R 25-08 A1.2.3, 20 dB(uV/m) in 25 kHz; P.1546-6 10% time; alert gate 0 dB
-Run (UTC): 2026-11-07T21:40:49+00:00
+Run (UTC): 2026-11-07T22:16:02+00:00
 Input brific3075_6f63a3dee548.sqlite: sha256 6e719f6ef29a90cfcd67653fbf856c4d3d951b1ffa880b4a52ebe53779adb52b (16306176 bytes)
 Input m4.json: sha256 a2391acd8e9db647713f9b903aa8f5abf68393db341caac7a7be395723bc234d (6454497 bytes)
 Input Traficom_SinceAI_Frequencies_of_interest_v05112026.xlsx: sha256 bb7f481f085fb6c457efc04b9b6bb8250c42ea81bab4b4a0e518c93834e03c8a (100809 bytes)

@@ -2,7 +2,7 @@ DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
 
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of United Arab Emirates (UAE)
-Date: 2026-11-07
+Date: 2026-11-08
 Subject: BR IFIC 3083 - satellite network NSAT01, notice 119520187 (and related notice 326520019):
          power flux-density over Finnish territory - RR No. 9.14 coordination threshold exceeded
 

@@ -284,7 +284,9 @@ def process(db: Path, digest: str, source: Path, kind: str, ific: int, cfg) -> d
     (out / "audit.txt").write_text("\n".join(audit) + "\n", encoding="utf-8")
     run = {"kind": kind, "ific": ific, "run_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "source": source.name, "source_sha256": digest, "n_alerts": len(alerts), "n_concerns": len(concerns),
-           "seconds": round(seconds, 1), "sqlite_path": str(db)}
+           "seconds": round(seconds, 1),
+           # relative to the project folder: portable, and no local user paths in the shared results
+           "sqlite_path": str(db.resolve().relative_to(ROOT)) if db.resolve().is_relative_to(ROOT) else str(db)}
     write_workbook(out / f"{kind}_{ific}_results.xlsx", kind, ific, run, alerts, concerns)
     store(run, alerts, concerns)
     log(f"  {kind} IFIC {ific}: {len(alerts)} alerts, {len(concerns)} concerns -> {out.relative_to(ROOT)}/ "
@@ -396,7 +398,8 @@ def previous_databases(ific: int) -> dict[int, Path]:
             return {}
         rows = con.execute("SELECT ific, sqlite_path FROM runs WHERE kind = 'terrestrial' AND ific < ? "
                            "AND sqlite_path IS NOT NULL", (ific,)).fetchall()
-    return {n: Path(p) for n, p in rows if Path(p).is_file()}
+    paths = {n: (Path(p) if Path(p).is_absolute() else ROOT / p) for n, p in rows}
+    return {n: path for n, path in paths.items() if path.is_file()}
 
 
 def already_processed(digest: str) -> bool:

@@ -2,7 +2,7 @@ DRAFT FOR EXPERT REVIEW - not for dispatch without technical verification
 
 From: Finnish Transport and Communications Agency Traficom, Spectrum and Space
 To:   Administration of Estonia (Republic of) (EST)
-Date: 2026-11-07
+Date: 2026-11-08
 Subject: BR IFIC (Terrestrial Services) No. 3075 - land-mobile assignment 93073940
          (IRU, 153.175 MHz): field strength at the Finnish border
 
